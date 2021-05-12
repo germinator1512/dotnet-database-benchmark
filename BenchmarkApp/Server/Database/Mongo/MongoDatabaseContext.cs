@@ -10,11 +10,11 @@ namespace BenchmarkApp.Server.Database.Mongo
 
         public MongoDatabaseContext(IConfiguration configuration)
         {
-            var connectionString = configuration.GetValue<string>("DatabaseConnectionString");
-            var databaseName = configuration.GetValue<string>("DatabaseName");
+            var config = new MongoConfig();
+            configuration.GetSection("MongoConfig").Bind(config);
 
-            var client = new MongoClient(connectionString);
-            _database = client.GetDatabase(databaseName);
+            var client = new MongoClient(config.DatabaseConnectionString);
+            _database = client.GetDatabase(config.DatabaseName);
         }
 
         public IMongoCollection<Entity> Entities => _database.GetCollection<Entity>("entities");

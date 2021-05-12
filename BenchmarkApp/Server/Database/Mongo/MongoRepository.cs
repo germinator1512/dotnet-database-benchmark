@@ -9,10 +9,7 @@ namespace BenchmarkApp.Server.Database.Mongo
     {
         private readonly MongoDatabaseContext _ctx;
 
-        public MongoRepository(MongoDatabaseContext context)
-        {
-            _ctx = context;
-        }
+        public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
         public async Task<IEnumerable<Entity>> GetAllEntities()
         {

@@ -8,10 +8,7 @@ namespace BenchmarkApp.Server.Database.Neo4J
     {
         private readonly Neo4JDatabaseContext _ctx;
 
-        public Neo4JRepository(Neo4JDatabaseContext context)
-        {
-            _ctx = context;
-        }
+        public Neo4JRepository(Neo4JDatabaseContext context) => _ctx = context;
 
         public Task<IEnumerable<Entity>> GetAllEntities()
         {

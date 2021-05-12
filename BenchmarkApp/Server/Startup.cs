@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,6 +10,7 @@ using System.Linq;
 using BenchmarkApp.Server.Database.Mongo;
 using BenchmarkApp.Server.Database.Neo4J;
 using BenchmarkApp.Server.Database.SQL;
+using Microsoft.EntityFrameworkCore;
 
 namespace BenchmarkApp.Server
 {
@@ -16,10 +18,10 @@ namespace BenchmarkApp.Server
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private readonly IConfiguration _configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -30,7 +32,14 @@ namespace BenchmarkApp.Server
 
 
             services.AddTransient<MongoDatabaseContext>();
-            services.AddTransient<SqlDatabaseContext>();
+            services.AddDbContext<SqlDatabaseContext>((_, options) =>
+            {
+                var connectionString = _configuration.GetConnectionString("postgres");
+                options.UseNpgsql(connectionString)
+                    .LogTo(Console.WriteLine)
+                    .EnableSensitiveDataLogging();
+            });
+            
             services.AddTransient<Neo4JDatabaseContext>();
 
             services.AddTransient<IMongoRepository, MongoRepository>();

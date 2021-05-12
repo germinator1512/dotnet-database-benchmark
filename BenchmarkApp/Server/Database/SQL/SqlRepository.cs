@@ -9,10 +9,7 @@ namespace BenchmarkApp.Server.Database.SQL
     {
         private readonly SqlDatabaseContext _ctx;
 
-        public SqlRepository(SqlDatabaseContext context)
-        {
-            _ctx = context;
-        }
+        public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
         public async Task<IEnumerable<Entity>> GetAllEntities()
         {
