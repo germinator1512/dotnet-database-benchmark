@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using BenchmarkApp.Server.Database.Mongo;
+using BenchmarkApp.Server.Database.Neo4J;
+using BenchmarkApp.Server.Database.SQL;
 
 namespace BenchmarkApp.Server
 {
@@ -22,9 +25,17 @@ namespace BenchmarkApp.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+
+            services.AddTransient<MongoDatabaseContext>();
+            services.AddTransient<SqlDatabaseContext>();
+            services.AddTransient<Neo4JDatabaseContext>();
+
+            services.AddTransient<IMongoRepository, MongoRepository>();
+            services.AddTransient<INeo4JRepository, Neo4JRepository>();
+            services.AddTransient<ISqlRepository, SqlRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
