@@ -31,17 +31,17 @@ namespace BenchmarkApp.Server
             services.AddRazorPages();
 
 
-            services.AddTransient<MongoDatabaseContext>();
             services.AddDbContext<SqlDatabaseContext>((_, options) =>
             {
-                var connectionString = _configuration.GetConnectionString("postgres");
+                var connectionString = _configuration.GetConnectionString("Postgres");
                 options.UseNpgsql(connectionString)
                     .LogTo(Console.WriteLine)
                     .EnableSensitiveDataLogging();
             });
-            
-            services.AddTransient<Neo4JDatabaseContext>();
 
+            services.AddTransient<Neo4JDatabaseContext>();
+            services.AddTransient<MongoDatabaseContext>();
+            
             services.AddTransient<IMongoRepository, MongoRepository>();
             services.AddTransient<INeo4JRepository, Neo4JRepository>();
             services.AddTransient<ISqlRepository, SqlRepository>();
@@ -67,7 +67,7 @@ namespace BenchmarkApp.Server
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();

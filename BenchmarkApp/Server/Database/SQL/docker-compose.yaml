@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+    image: postgres:13-alpine
+    restart: on-failure
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 25433:5432
+    volumes:
+    - "pgdata:/var/lib/postgresql/data"
+volumes:
+  pgdata:
