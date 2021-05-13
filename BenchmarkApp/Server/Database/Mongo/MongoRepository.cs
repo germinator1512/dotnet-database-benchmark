@@ -11,7 +11,7 @@ namespace BenchmarkApp.Server.Database.Mongo
 
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<Entity>> GetAllEntities()
+        public async Task<IEnumerable<Entity>> GetAllEntitiesAsync()
         {
             return await _ctx.Entities.Find(_ => true).ToListAsync();
         }

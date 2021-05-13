@@ -1,0 +1,22 @@
+﻿@page "/"
+@using BenchmarkApp.Shared
+@inject HttpClient Http
+
+<button class="btn btn-primary" @onclick="StartBenchmark">Start SQL Benchmark</button>
+
+@if (_result != null)
+{
+    <h1>@_result.Success</h1>
+}
+
+
+@code {
+
+    private BenchmarkResult _result;
+
+    private async Task StartBenchmark()
+    {
+        _result = await Http.GetFromJsonAsync<BenchmarkResult>("benchmark/sql");
+    }
+
+}

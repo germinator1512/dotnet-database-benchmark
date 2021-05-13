@@ -6,6 +6,6 @@ namespace BenchmarkApp.Server.Database.Core
 {
     public interface IEntityRepository
     {
-        Task<IEnumerable<Entity>> GetAllEntities();
+        Task<IEnumerable<Entity>> GetAllEntitiesAsync();
     }
 }

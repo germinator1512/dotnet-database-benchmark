@@ -11,7 +11,7 @@ namespace BenchmarkApp.Server.Database.SQL
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<Entity>> GetAllEntities()
+        public async Task<IEnumerable<Entity>> GetAllEntitiesAsync()
         {
             return await _ctx.Entities.ToListAsync();
         }
