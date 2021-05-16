@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Entities;
+using BenchmarkApp.Server.Database.SQL.Entities;
 
 namespace BenchmarkApp.Server.Database.Neo4J
 {
@@ -10,7 +11,7 @@ namespace BenchmarkApp.Server.Database.Neo4J
 
         public Neo4JRepository(Neo4JDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<Entity>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<UserEntity>> GetAllEntitiesAsync()
         {
             var query = "MATCH (entity:Entity) RETURN entity";
 
@@ -20,32 +21,30 @@ namespace BenchmarkApp.Server.Database.Neo4J
 
             try
             {
-                // Wrap whole operation into an managed transaction and
-                // get the results back.
                 result = await session.ReadTransactionAsync(async tx =>
                 {
                     var products = new List<string>();
 
-                    // Send cypher query to the database
                     var reader = await tx.RunAsync(query);
 
-                    // Loop through the records asynchronously
                     while (await reader.FetchAsync())
                     {
-                        // Each current read in buffer can be reached via Current
                         products.Add(reader.Current[0].ToString());
                     }
 
                     return products;
                 });
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             finally
             {
-                // asynchronously close session
                 await session.CloseAsync();
             }
 
-            return new List<Entity>();
+            return new List<UserEntity>();
         }
     }
 }

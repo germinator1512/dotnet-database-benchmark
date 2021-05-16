@@ -1,4 +1,4 @@
-﻿using BenchmarkApp.Server.Database.Entities;
+﻿using BenchmarkApp.Server.Database.SQL.Entities;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
@@ -17,6 +17,6 @@ namespace BenchmarkApp.Server.Database.Mongo
             _database = client.GetDatabase(config.DatabaseName);
         }
 
-        public IMongoCollection<Entity> Entities => _database.GetCollection<Entity>("entities");
+        public IMongoCollection<UserEntity> Users => _database.GetCollection<UserEntity>("users");
     }
 }

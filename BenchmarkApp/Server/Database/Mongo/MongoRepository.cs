@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Entities;
+using BenchmarkApp.Server.Database.SQL.Entities;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo
@@ -11,9 +11,9 @@ namespace BenchmarkApp.Server.Database.Mongo
 
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<Entity>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<UserEntity>> GetAllEntitiesAsync()
         {
-            return await _ctx.Entities.Find(_ => true).ToListAsync();
+            return await _ctx.Users.Find(_ => true).ToListAsync();
         }
     }
 }
