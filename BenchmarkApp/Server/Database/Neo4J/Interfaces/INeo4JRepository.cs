@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Core;
+using BenchmarkApp.Server.Database.Neo4J.Entities;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Interfaces
 {
     public interface INeo4JRepository
     {
-        Task<IEnumerable<IUserEntity>> GetAllEntitiesAsync();
+        Task<IEnumerable<Neo4jUserEntity>> GetAllEntitiesAsync();
+        Task AddEntitiesAsync(IEnumerable<Neo4jUserEntity> users);
     }
 }

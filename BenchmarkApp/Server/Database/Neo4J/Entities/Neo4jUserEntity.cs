@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using BenchmarkApp.Server.Database.Core;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Entities
 {
-    public class Neo4jUserEntity :IUserEntity
+    public class Neo4jUserEntity 
     {
         public int Id { get; set; }
 

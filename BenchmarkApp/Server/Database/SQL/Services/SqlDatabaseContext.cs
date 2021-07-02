@@ -16,10 +16,6 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SqlUserEntity>()
-                .HasMany(u => u.Friends);
-
-
             modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasKey(f => new {f.FriendAId, f.FriendBId});
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 
@@ -13,15 +12,14 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public Neo4JRepository(Neo4JDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<IUserEntity>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<Neo4jUserEntity>> GetAllEntitiesAsync()
         {
             var query = "MATCH (entity:Entity) RETURN entity";
-
 
             List<string> result = null;
             var session = _ctx.Driver.AsyncSession();
 
-            try
+            try 
             {
                 result = await session.ReadTransactionAsync(async tx =>
                 {
@@ -47,6 +45,11 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             }
 
             return new List<Neo4jUserEntity>();
+        }
+
+        public Task AddEntitiesAsync(IEnumerable<Neo4jUserEntity> users)
+        {
+            throw new NotImplementedException();
         }
     }
 }

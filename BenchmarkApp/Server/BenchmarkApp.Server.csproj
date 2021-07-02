@@ -22,4 +22,9 @@
         <ProjectReference Include="..\Client\BenchmarkApp.Client.csproj" />
         <ProjectReference Include="..\Shared\BenchmarkApp.Shared.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Database\Core" />
+      <Folder Include="Migrations" />
+    </ItemGroup>
 </Project>

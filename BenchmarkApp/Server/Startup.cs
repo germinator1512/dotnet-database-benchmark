@@ -51,12 +51,12 @@ namespace BenchmarkApp.Server
             services.AddTransient<IMongoBenchmarkService, MongoBenchmarkService>();
             services.AddTransient<INeo4JBenchmarkService, Neo4JBenchmarkService>();
             services.AddTransient<ISQLBenchmarkService, SqlBenchmarkService>();
-            
+
 
             // database initialization
             services.AddHostedService<PostgresInitializerService>();
             services.AddHostedService<MongoInitializerService>();
-
+            services.AddHostedService<Neo4JInitializerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

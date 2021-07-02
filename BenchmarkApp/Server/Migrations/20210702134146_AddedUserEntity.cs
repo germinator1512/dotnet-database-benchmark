@@ -13,18 +13,11 @@ namespace BenchmarkApp.Server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    UserEntityId = table.Column<int>(type: "integer", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Users_UserEntityId",
-                        column: x => x.UserEntityId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,11 +48,6 @@ namespace BenchmarkApp.Server.Migrations
                 name: "IX_Friendships_FriendBId",
                 table: "Friendships",
                 column: "FriendBId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_UserEntityId",
-                table: "Users",
-                column: "UserEntityId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
