@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace BenchmarkApp.Server.Database.SQL
+namespace BenchmarkApp.Server.Database.SQL.Services
 {
     public class PostgresInitializerService : IHostedService
     {

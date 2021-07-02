@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BenchmarkApp.Server.Database.Mongo;
-using BenchmarkApp.Server.Database.Neo4J;
-using BenchmarkApp.Server.Database.SQL;
+using BenchmarkApp.Server.Database.Mongo.Interfaces;
+using BenchmarkApp.Server.Database.Mongo.Services;
+using BenchmarkApp.Server.Database.Neo4J.Interfaces;
+using BenchmarkApp.Server.Database.Neo4J.Services;
+using BenchmarkApp.Server.Database.SQL.Interfaces;
+using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services;
 using BenchmarkApp.Server.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -44,15 +47,15 @@ namespace BenchmarkApp.Server
             services.AddTransient<IMongoRepository, MongoRepository>();
             services.AddTransient<INeo4JRepository, Neo4JRepository>();
             services.AddTransient<ISqlRepository, SqlRepository>();
-            
+
             services.AddTransient<IMongoBenchmarkService, MongoBenchmarkService>();
             services.AddTransient<INeo4JBenchmarkService, Neo4JBenchmarkService>();
-            services.AddTransient<ISQLBenchmarkService, SQLBenchmarkService>();
+            services.AddTransient<ISQLBenchmarkService, SqlBenchmarkService>();
             
-            
-            
+
             // database initialization
             services.AddHostedService<PostgresInitializerService>();
+            services.AddHostedService<MongoInitializerService>();
 
         }
 

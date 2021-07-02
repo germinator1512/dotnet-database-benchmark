@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Neo4j.Driver;
 
-namespace BenchmarkApp.Server.Database.Neo4J
+namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
     public class Neo4JDatabaseContext : IDisposable
     {

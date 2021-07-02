@@ -1,0 +1,8 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="dbs" type="CompoundRunConfigurationType">
+    <toRun name="postgres-db" type="docker-deploy" />
+    <toRun name="neo4j-db" type="docker-deploy" />
+    <toRun name="mongo-db" type="docker-deploy" />
+    <method v="2" />
+  </configuration>
+</component>

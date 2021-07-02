@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.SQL.Entities;
+using BenchmarkApp.Server.Database.Core;
+using BenchmarkApp.Server.Database.Neo4J.Entities;
+using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 
-namespace BenchmarkApp.Server.Database.Neo4J
+namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
     public class Neo4JRepository : INeo4JRepository
     {
@@ -11,7 +13,7 @@ namespace BenchmarkApp.Server.Database.Neo4J
 
         public Neo4JRepository(Neo4JDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<UserEntity>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<IUserEntity>> GetAllEntitiesAsync()
         {
             var query = "MATCH (entity:Entity) RETURN entity";
 
@@ -44,7 +46,7 @@ namespace BenchmarkApp.Server.Database.Neo4J
                 await session.CloseAsync();
             }
 
-            return new List<UserEntity>();
+            return new List<Neo4jUserEntity>();
         }
     }
 }

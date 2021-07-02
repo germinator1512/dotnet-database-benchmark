@@ -1,7 +1,7 @@
 ﻿using BenchmarkApp.Server.Database.SQL.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BenchmarkApp.Server.Database.SQL
+namespace BenchmarkApp.Server.Database.SQL.Services
 {
     public class SqlDatabaseContext : DbContext
     {
@@ -9,26 +9,26 @@ namespace BenchmarkApp.Server.Database.SQL
         {
         }
 
-        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<SqlUserEntity> Users { get; set; }
 
-        public DbSet<FriendshipEntity> Friendships { get; set; }
+        public DbSet<SqlFriendshipEntity> Friendships { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserEntity>()
+            modelBuilder.Entity<SqlUserEntity>()
                 .HasMany(u => u.Friends);
 
 
-            modelBuilder.Entity<FriendshipEntity>()
+            modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasKey(f => new {f.FriendAId, f.FriendBId});
 
 
-            modelBuilder.Entity<FriendshipEntity>()
+            modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasOne(g => g.FriendA);
 
 
-            modelBuilder.Entity<FriendshipEntity>()
+            modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasOne(g => g.FriendB);
         }
     }

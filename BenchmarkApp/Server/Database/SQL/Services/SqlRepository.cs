@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.SQL.Entities;
+using BenchmarkApp.Server.Database.Core;
+using BenchmarkApp.Server.Database.SQL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace BenchmarkApp.Server.Database.SQL
+namespace BenchmarkApp.Server.Database.SQL.Services
 {
     public class SqlRepository : ISqlRepository
     {
@@ -11,7 +12,7 @@ namespace BenchmarkApp.Server.Database.SQL
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<UserEntity>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<IUserEntity>> GetAllEntitiesAsync()
         {
             return await _ctx.Users.ToListAsync();
         }
