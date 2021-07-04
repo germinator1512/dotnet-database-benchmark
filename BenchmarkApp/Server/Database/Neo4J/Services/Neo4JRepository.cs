@@ -49,7 +49,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public Task AddEntitiesAsync(IEnumerable<Neo4jUserEntity> users)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BenchmarkApp.Server.Migrations
 {
-    public partial class AddedUserEntity : Migration
+    public partial class AddedUsers : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,7 +25,8 @@ namespace BenchmarkApp.Server.Migrations
                 columns: table => new
                 {
                     FriendAId = table.Column<int>(type: "integer", nullable: false),
-                    FriendBId = table.Column<int>(type: "integer", nullable: false)
+                    FriendBId = table.Column<int>(type: "integer", nullable: false),
+                    SqlUserEntityId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,12 +43,23 @@ namespace BenchmarkApp.Server.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Friendships_Users_SqlUserEntityId",
+                        column: x => x.SqlUserEntityId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Friendships_FriendBId",
                 table: "Friendships",
                 column: "FriendBId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Friendships_SqlUserEntityId",
+                table: "Friendships",
+                column: "SqlUserEntityId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

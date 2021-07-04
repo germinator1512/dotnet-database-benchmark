@@ -24,31 +24,83 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.Database.MigrateAsync(cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            var repository = scope.ServiceProvider.GetRequiredService<ISqlRepository>();
-            var entities = await repository.GetAllEntitiesAsync();
-            if (!entities.Any())
-            {
-                AddDataSet(repository);
-            }
+
+            // context.Friendships.RemoveRange(context.Friendships);
+            // context.Users.RemoveRange(context.Users);
+            //
+            // await context.SaveChangesAsync(cancellationToken);
+
+            if (!context.Users.Any())
+                await AddDataSet(context);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        private static void AddDataSet(ISqlRepository repository)
+        private async Task AddDataSet(SqlDatabaseContext context)
         {
             Console.WriteLine("No entities found in PostgresDb - Inserting Test Dataset");
 
-
-            var userA = new SqlUserEntity
+            var firstUser = new SqlUserEntity
             {
                 Name = "Max Mustermann"
             };
-            var userB = new SqlUserEntity
-            {
-                Name = "Erika Mustermann"
-            };
 
-            repository.AddEntitiesAsync(new List<SqlUserEntity> {userA, userB});
+            await context.Users.AddAsync(firstUser);
+
+
+            var level1Friends = GenerateFriends(firstUser, 10, 1);
+            await context.Users.AddRangeAsync(level1Friends);
+
+
+            foreach (var level1Friend in level1Friends)
+            {
+                var level2Friends = GenerateFriends(level1Friend, 10, 2);
+                await context.Users.AddRangeAsync(level2Friends);
+
+
+                foreach (var level2Friend in level2Friends)
+                {
+                    var level3Friends = GenerateFriends(level2Friend, 10, 3);
+                    await context.Users.AddRangeAsync(level3Friends);
+
+
+                    foreach (var level3Friend in level3Friends)
+                    {
+                        var level4Friends = GenerateFriends(level3Friend, 10, 4);
+                        await context.Users.AddRangeAsync(level4Friends);
+
+                        foreach (var level4Friend in level4Friends)
+                        {
+                            var level5Friends = GenerateFriends(level4Friend, 10, 5);
+                            await context.Users.AddRangeAsync(level5Friends);
+                        }
+                    }
+                }
+            }
+
+            await context.SaveChangesAsync();
         }
+
+        private List<SqlUserEntity> GenerateFriends(SqlUserEntity rootFriend,
+            int howMany,
+            int level)
+        {
+            var newFriends = new List<SqlUserEntity>();
+            for (var z = 1; z <= howMany; z++)
+            {
+                var friend = new SqlUserEntity
+                {
+                    Name = $"Level {level} Friend {z}"
+                };
+                rootFriend.FriendShips.Add(new SqlFriendshipEntity
+                {
+                    FriendA = rootFriend,
+                    FriendB = friend
+                });
+                newFriends.Add(friend);
+            }
+
+            return newFriends;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }
