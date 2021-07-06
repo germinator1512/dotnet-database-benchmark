@@ -18,10 +18,7 @@ namespace BenchmarkApp.Server
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => _configuration = configuration;
 
         private readonly IConfiguration _configuration;
 

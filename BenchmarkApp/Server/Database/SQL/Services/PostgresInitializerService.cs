@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.SQL.Entities;
-using BenchmarkApp.Server.Database.SQL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,39 +43,46 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             };
 
             await context.Users.AddAsync(firstUser);
+            await context.SaveChangesAsync();
 
-
-            var level1Friends = GenerateFriends(firstUser, 10, 1);
+            var level1Friends = GenerateFriends(firstUser, 9, 1);
             await context.Users.AddRangeAsync(level1Friends);
-
+            await context.SaveChangesAsync();
 
             foreach (var level1Friend in level1Friends)
             {
                 var level2Friends = GenerateFriends(level1Friend, 10, 2);
                 await context.Users.AddRangeAsync(level2Friends);
-
+                await context.SaveChangesAsync();
 
                 foreach (var level2Friend in level2Friends)
                 {
                     var level3Friends = GenerateFriends(level2Friend, 10, 3);
                     await context.Users.AddRangeAsync(level3Friends);
-
+                    await context.SaveChangesAsync();
 
                     foreach (var level3Friend in level3Friends)
                     {
                         var level4Friends = GenerateFriends(level3Friend, 10, 4);
                         await context.Users.AddRangeAsync(level4Friends);
-
+                        await context.SaveChangesAsync();
+                        
                         foreach (var level4Friend in level4Friends)
                         {
                             var level5Friends = GenerateFriends(level4Friend, 10, 5);
                             await context.Users.AddRangeAsync(level5Friends);
+                            await context.SaveChangesAsync();
+                            
+                            foreach (var level5Friend in level5Friends)
+                            {
+                                var level6Friends = GenerateFriends(level5Friend, 10, 6);
+                                await context.Users.AddRangeAsync(level6Friends);
+                                await context.SaveChangesAsync();
+                            }
                         }
                     }
                 }
             }
-
-            await context.SaveChangesAsync();
         }
 
         private List<SqlUserEntity> GenerateFriends(SqlUserEntity rootFriend,
@@ -88,7 +94,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             {
                 var friend = new SqlUserEntity
                 {
-                    Name = $"Level {level} Friend {z}"
+                    Name = $"User {rootFriend.Id} Level {level} Friend {z}"
                 };
                 rootFriend.FriendShips.Add(new SqlFriendshipEntity
                 {

@@ -13,7 +13,7 @@ namespace BenchmarkApp.Server.Services
 
         public async Task<BenchmarkResult> StartBenchmark()
         {
-            var entities = await _sqlRepository.GetAllFriendsAsync( 5);
+            var entities = await _sqlRepository.GetAllFriendsAsync( 6);
             return new BenchmarkResult
             {
                 Success = true
