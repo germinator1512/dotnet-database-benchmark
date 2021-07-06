@@ -6,7 +6,6 @@ namespace BenchmarkApp.Server.Database.SQL.Interfaces
 {
     public interface ISqlRepository
     {
-        Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int depth);
-        Task AddEntitiesAsync(IEnumerable<SqlUserEntity> users);
+        Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level);
     }
 }

@@ -12,9 +12,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<MongoUserEntity>> GetAllEntitiesAsync() =>
+        public async Task<IEnumerable<MongoUserEntity>> GetAllUsersAsync(int level) =>
             await _ctx.Users.Find(_ => true).ToListAsync();
-
-        public void AddEntities(IEnumerable<MongoUserEntity> users) => _ctx.Users.InsertMany(users);
+        
+        public async Task<IEnumerable<MongoUserEntity>> GetAllFriendsAsync(int level) =>
+            await _ctx.FriendShips.Find(_ => true).ToListAsync();
     }
 }

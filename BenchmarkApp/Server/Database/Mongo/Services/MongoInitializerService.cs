@@ -22,32 +22,48 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             var scope = _serviceProvider.CreateScope();
             var repository = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
+            var context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
 
-            var users = await repository.GetAllEntitiesAsync();
-            if (!users.Any())
-            {
-                AddDataSet(repository);
-            }
+            var friends = await repository.GetAllFriendsAsync(6);
+
+            if (!friends.Any())
+                await AddDataSet(context);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        private static void AddDataSet(IMongoRepository repository)
+        private async Task AddDataSet(MongoDatabaseContext context)
         {
             Console.WriteLine("No entities found in MongoDB - Inserting Test Dataset");
 
-            var userA = new MongoUserEntity
+            var firstUser = new MongoUserEntity
             {
                 Name = "Max Mustermann",
-                Friends = new List<MongoDBRef>()
-            };
-            var userB = new MongoUserEntity
-            {
-                Name = "Erika Mustermann",
-                Friends = new List<MongoDBRef> { }
             };
 
-            repository.AddEntities(new List<MongoUserEntity> {userA, userB});
+            await context.Users.InsertOneAsync(firstUser);
+
+            var level1Friends = GenerateFriends(firstUser, 9, 1);
+            await context.Users.InsertManyAsync(level1Friends);
+        }
+
+        // https://chrisbitting.com/2015/03/24/mongodb-linking-records-documents-using-mongodbref/
+        private List<MongoUserEntity> GenerateFriends(MongoUserEntity rootFriend,
+            int howMany,
+            int level)
+        {
+            var newFriends = new List<MongoUserEntity>();
+            for (var z = 1; z <= howMany; z++)
+            {
+                var friend = new MongoUserEntity
+                {
+                    Name = $"User {rootFriend.Id} Level {level} Friend {z}",
+                };
+
+                // rootFriend.Friends.Add(new MongoDBRef {"", friend.Id});
+            }
+
+            return newFriends;
         }
     }
 }

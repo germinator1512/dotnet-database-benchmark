@@ -8,10 +8,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Entities
     public class MongoUserEntity 
     {
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public BsonValue Id { get; set; }
 
         public string Name { get; set; }
 
-        public IEnumerable<MongoDBRef> Friends { get; set; }
+        public List<MongoDBRef> Friends { get; set; }
     }
 }

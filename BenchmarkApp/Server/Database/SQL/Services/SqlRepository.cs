@@ -13,39 +13,32 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int depth)
+        public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
         {
             var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals("Max Mustermann"));
 
             return await _ctx.Friendships
                 .Where(f => f.FriendA.Id == firstUser.Id)
                 .Include(f => f.FriendB)
-                .If(depth > 0, level1 => level1
+                .If(level > 0, level1 => level1
                     .ThenInclude(user => user.FriendShips)
                     .ThenInclude(f => f.FriendB)
-                    .If(depth > 1, level2 => level2
+                    .If(level > 1, level2 => level2
                         .ThenInclude(user => user.FriendShips)
                         .ThenInclude(f => f.FriendB)
-                        .If(depth > 2, level3 => level3
+                        .If(level > 2, level3 => level3
                             .ThenInclude(user => user.FriendShips)
                             .ThenInclude(f => f.FriendB)
-                            .If(depth > 3, level4 => level4
+                            .If(level > 3, level4 => level4
                                 .ThenInclude(user => user.FriendShips)
                                 .ThenInclude(f => f.FriendB)
-                                .If(depth > 4, level5 => level5
+                                .If(level > 4, level5 => level5
                                     .ThenInclude(user => user.FriendShips)
                                     .ThenInclude(f => f.FriendB)
-                                    .If(depth > 5, level6 => level6
+                                    .If(level > 5, level6 => level6
                                         .ThenInclude(user => user.FriendShips)
                                         .ThenInclude(f => f.FriendB)))))))
                 .ToListAsync();
-        }
-
-
-        public async Task AddEntitiesAsync(IEnumerable<SqlUserEntity> users)
-        {
-            await _ctx.Users.AddRangeAsync(users);
-            await _ctx.SaveChangesAsync();
         }
     }
 }
