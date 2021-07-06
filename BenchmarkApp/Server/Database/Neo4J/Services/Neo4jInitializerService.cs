@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
-using BenchmarkApp.Server.Database.SQL.Entities;
-using BenchmarkApp.Server.Database.SQL.Interfaces;
-using BenchmarkApp.Server.Database.SQL.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -26,9 +21,8 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             var repository = scope.ServiceProvider.GetRequiredService<INeo4JRepository>();
             var entities = await repository.GetAllEntitiesAsync();
             if (!entities.Any())
-            {
                 AddDataSet(repository);
-            }
+            
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -46,8 +40,6 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             {
                 Name = "Erika Mustermann"
             };
-
-            repository.AddEntitiesAsync(new List<Neo4jUserEntity> {userA, userB});
         }
     }
 }

@@ -44,7 +44,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             await context.Users.InsertOneAsync(firstUser);
 
             var level1Friends = GenerateFriends(firstUser, 9, 1);
-            await context.Users.InsertManyAsync(level1Friends);
+            // await context.Users.InsertManyAsync(level1Friends);
         }
 
         // https://chrisbitting.com/2015/03/24/mongodb-linking-records-documents-using-mongodbref/
