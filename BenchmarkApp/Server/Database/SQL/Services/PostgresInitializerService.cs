@@ -34,7 +34,11 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             context.Users.RemoveRange(context.Users);
             await context.SaveChangesAsync(cancellationToken);
         }
-
+        
+        /// <summary>
+        /// adds one million user entities to database which are nested 6 levels deep
+        /// </summary>
+        /// <param name="context"></param>
         private async Task AddDataSet(SqlDatabaseContext context)
         {
             Console.WriteLine("No entities found in PostgresDb - Inserting Test Dataset");
