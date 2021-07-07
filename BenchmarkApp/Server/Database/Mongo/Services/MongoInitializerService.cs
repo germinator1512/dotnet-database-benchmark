@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Mongo.Entities;
-using BenchmarkApp.Server.Database.Mongo.Interfaces;
-using BenchmarkApp.Server.Database.SQL.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
@@ -18,17 +16,15 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
         public MongoInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
-            var repository = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
             var context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
 
-            var friends = new List<MongoUserEntity>();
-
+            var friends = await context.Users.Find(_ => true).ToListAsync(cancellationToken);
             if (!friends.Any()) await AddDataSet(context);
         }
+
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
@@ -75,10 +71,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 };
                 await friendships.InsertOneAsync(friendShip);
 
-                // var filter = Builders<MongoUserEntity>.Filter.Eq(x => x.Id, rootFriend.Id);
-                // var dbRef = new MongoDBRef("friendShips", friendShip.Id);
-                // var updateDefinition = Builders<MongoUserEntity>.Update.AddToSet(u => u.FriendShipRefs, dbRef);
-                // await users.UpdateOneAsync(filter, updateDefinition);
+                var filter = Builders<MongoUserEntity>.Filter.Eq(x => x.Id, rootFriend.Id);
+                var dbRef = new MongoDBRef("friendShips", friendShip.Id);
+                var updateDefinition = Builders<MongoUserEntity>.Update.Push(u => u.FriendShipRefs, dbRef);
+                await users.FindOneAndUpdateAsync(filter, updateDefinition);
 
                 newFriends.Add(friend);
             }
