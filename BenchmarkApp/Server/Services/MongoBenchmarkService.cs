@@ -13,6 +13,7 @@ namespace BenchmarkApp.Server.Services
         public async Task<BenchmarkResult> StartBenchmark()
         {
             var entities = await _mongoRepository.GetAllFriendsAsync(6);
+          
             return new BenchmarkResult
             {
                 Success = true

@@ -22,15 +22,17 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var context = scope.ServiceProvider.GetRequiredService<SqlDatabaseContext>();
             await context.Database.MigrateAsync(cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
+            
+            // await EmptyDatabase(cancellationToken, context);
 
+            if (!context.Users.Any()) await AddDataSet(context);
+        }
 
-            // context.Friendships.RemoveRange(context.Friendships);
-            // context.Users.RemoveRange(context.Users);
-
-            // await context.SaveChangesAsync(cancellationToken);
-
-            if (!context.Users.Any())
-                await AddDataSet(context);
+        private async Task EmptyDatabase(CancellationToken cancellationToken, SqlDatabaseContext context)
+        {
+            context.Friendships.RemoveRange(context.Friendships);
+            context.Users.RemoveRange(context.Users);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         private async Task AddDataSet(SqlDatabaseContext context)

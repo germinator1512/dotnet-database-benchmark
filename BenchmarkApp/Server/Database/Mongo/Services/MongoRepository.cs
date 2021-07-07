@@ -12,10 +12,24 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<MongoUserEntity>> GetAllUsersAsync(int level) =>
-            await _ctx.Users.Find(_ => true).ToListAsync();
-        
-        public async Task<IEnumerable<MongoUserEntity>> GetAllFriendsAsync(int level) =>
-            await _ctx.FriendShips.Find(_ => true).ToListAsync();
+        public async Task<IEnumerable<MongoFriendShipEntity>> GetAllFriendsAsync(int level)
+        {
+            var user = await _ctx.Users
+                .Find(u => u.Name == "Max Mustermann")
+                .SingleAsync();
+
+            await user.LoadFriendShips(_ctx);
+            foreach (var entity in user.FriendShips)
+            {
+                await entity.LoadFriend(_ctx);
+            }
+
+            if (level > 0)
+            {
+                
+            }
+
+            return user.FriendShips;
+        }
     }
 }

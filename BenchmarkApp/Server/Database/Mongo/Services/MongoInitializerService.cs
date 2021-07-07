@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Mongo.Entities;
 using BenchmarkApp.Server.Database.Mongo.Interfaces;
+using BenchmarkApp.Server.Database.SQL.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
@@ -24,10 +25,9 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             var repository = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
             var context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
 
-            var friends = await repository.GetAllFriendsAsync(6);
+            var friends = new List<MongoUserEntity>();
 
-            if (!friends.Any())
-                await AddDataSet(context);
+            if (!friends.Any()) await AddDataSet(context);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -36,19 +36,26 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             Console.WriteLine("No entities found in MongoDB - Inserting Test Dataset");
 
+            var users = context.Database.GetCollection<MongoUserEntity>("users");
+            var friendships = context.Database.GetCollection<MongoFriendShipEntity>("friendShips");
+
             var firstUser = new MongoUserEntity
             {
                 Name = "Max Mustermann",
             };
 
+            var level1Friends = await AddFriends(firstUser, users, friendships, 9, 1);
             await context.Users.InsertOneAsync(firstUser);
 
-            var level1Friends = GenerateFriends(firstUser, 9, 1);
-            // await context.Users.InsertManyAsync(level1Friends);
+            foreach (var level1Friend in level1Friends)
+            {
+                var level2Friends = await AddFriends(level1Friend, users, friendships, 10, 2);
+            }
         }
 
-        // https://chrisbitting.com/2015/03/24/mongodb-linking-records-documents-using-mongodbref/
-        private List<MongoUserEntity> GenerateFriends(MongoUserEntity rootFriend,
+        private async Task<List<MongoUserEntity>> AddFriends(MongoUserEntity rootFriend,
+            IMongoCollection<MongoUserEntity> users,
+            IMongoCollection<MongoFriendShipEntity> friendships,
             int howMany,
             int level)
         {
@@ -57,11 +64,25 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             {
                 var friend = new MongoUserEntity
                 {
-                    Name = $"User {rootFriend.Id} Level {level} Friend {z}",
+                    Name = $"Level {level} Friend {z}",
                 };
 
-                // rootFriend.Friends.Add(new MongoDBRef {"", friend.Id});
+                await users.InsertOneAsync(friend);
+
+                var friendShip = new MongoFriendShipEntity
+                {
+                    FriendRef = new MongoDBRef("users", friend.Id),
+                };
+                await friendships.InsertOneAsync(friendShip);
+
+                var filter = Builders<MongoUserEntity>.Filter.Eq(x => x.Id, rootFriend.Id);
+                var dbRef = new MongoDBRef("friendShips", friendShip.Id);
+                var updateDefinition = Builders<MongoUserEntity>.Update.AddToSet(u => u.FriendShipRefs, dbRef);
+                await users.UpdateOneAsync(filter, updateDefinition);
+
+                newFriends.Add(friend);
             }
+
 
             return newFriends;
         }

@@ -6,6 +6,6 @@ namespace BenchmarkApp.Server.Database.Mongo.Interfaces
 {
     public interface IMongoRepository
     {
-        Task<IEnumerable<MongoUserEntity>> GetAllFriendsAsync(int level);
+        Task<IEnumerable<MongoFriendShipEntity>> GetAllFriendsAsync(int level);
     }
 }
