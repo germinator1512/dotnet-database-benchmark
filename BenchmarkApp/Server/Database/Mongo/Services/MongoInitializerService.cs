@@ -75,10 +75,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 };
                 await friendships.InsertOneAsync(friendShip);
 
-                var filter = Builders<MongoUserEntity>.Filter.Eq(x => x.Id, rootFriend.Id);
-                var dbRef = new MongoDBRef("friendShips", friendShip.Id);
-                var updateDefinition = Builders<MongoUserEntity>.Update.AddToSet(u => u.FriendShipRefs, dbRef);
-                await users.UpdateOneAsync(filter, updateDefinition);
+                // var filter = Builders<MongoUserEntity>.Filter.Eq(x => x.Id, rootFriend.Id);
+                // var dbRef = new MongoDBRef("friendShips", friendShip.Id);
+                // var updateDefinition = Builders<MongoUserEntity>.Update.AddToSet(u => u.FriendShipRefs, dbRef);
+                // await users.UpdateOneAsync(filter, updateDefinition);
 
                 newFriends.Add(friend);
             }
