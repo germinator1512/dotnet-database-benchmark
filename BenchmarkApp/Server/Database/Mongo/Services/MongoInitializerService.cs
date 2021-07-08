@@ -26,9 +26,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         }
 
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        private async Task AddDataSet(MongoDatabaseContext context)
+        /// <summary>
+        /// adds 1 million users with nested friendships to mongo database 
+        /// </summary>
+        /// <param name="context"></param>
+        private static async Task AddDataSet(MongoDatabaseContext context)
         {
             Console.WriteLine("No entities found in MongoDB - Inserting Test Dataset");
 
@@ -41,61 +43,39 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             };
 
             await users.InsertOneAsync(firstUser);
+            await AddFriendRecursively(context, firstUser, 9, 3, 0);
+        }
 
+        /// <summary>
+        /// adds nested user entities to database until given level is reached
+        /// </summary>
+        /// <param name="context">database context to add entities to</param>
+        /// <param name="root">first user entity</param>
+        /// <param name="howMany">number of new entities to be added</param>
+        /// <param name="level">how many levels deep entities should be nested</param>
+        /// <param name="currentDepth">current level of function call</param>
+        private static async Task AddFriendRecursively(
+            MongoDatabaseContext context,
+            MongoUserEntity root,
+            int howMany,
+            int level,
+            int currentDepth)
+        {
+            var friends = GenerateFriends(howMany, currentDepth);
+            await context.Users.InsertManyAsync(friends);
 
-            var level1Friends = GenerateFriends(9, 1);
-            await users.InsertManyAsync(level1Friends);
+            var friendships = GenerateFriendShips(root, friends);
+            await context.FriendShips.InsertManyAsync(friendships);
 
-            var friendShipList = GenerateFriendShips(firstUser, level1Friends);
-            await friendships.InsertManyAsync(friendShipList);
-
-
-            foreach (var level1Friend in level1Friends)
+            if (level > currentDepth)
             {
-                var level2Friends = GenerateFriends(10, 2);
-                await users.InsertManyAsync(level2Friends);
-
-
-                var level1FriendShips = GenerateFriendShips(level1Friend, level2Friends);
-                await friendships.InsertManyAsync(level1FriendShips);
-
-                foreach (var level2Friend in level2Friends)
+                foreach (var friend in friends)
                 {
-                    var level3Friends = GenerateFriends(10, 3);
-                    await users.InsertManyAsync(level3Friends);
-
-                    var level2FriendShips = GenerateFriendShips(level2Friend, level3Friends);
-                    await friendships.InsertManyAsync(level2FriendShips);
-
-                    foreach (var level3Friend in level3Friends)
-                    {
-                        var level4Friends = GenerateFriends(10, 4);
-                        await users.InsertManyAsync(level4Friends);
-
-                        var level3FriendShips = GenerateFriendShips(level3Friend, level4Friends);
-                        await friendships.InsertManyAsync(level3FriendShips);
-
-                        foreach (var level4Friend in level4Friends)
-                        {
-                            var level5Friends = GenerateFriends(10, 5);
-                            await users.InsertManyAsync(level5Friends);
-
-                            var level4FriendShips = GenerateFriendShips(level4Friend, level5Friends);
-                            await friendships.InsertManyAsync(level4FriendShips);
-
-                            foreach (var level5Friend in level5Friends)
-                            {
-                                var level6Friends = GenerateFriends(10, 6);
-                                await users.InsertManyAsync(level6Friends);
-
-                                var level5FriendShips = GenerateFriendShips(level5Friend, level6Friends);
-                                await friendships.InsertManyAsync(level5FriendShips);
-                            }
-                        }
-                    }
+                    await AddFriendRecursively(context, friend, 10, level, ++currentDepth);
                 }
             }
         }
+
 
         private static List<MongoUserEntity> GenerateFriends(
             int howMany,
@@ -134,5 +114,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             return newFriends;
         }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

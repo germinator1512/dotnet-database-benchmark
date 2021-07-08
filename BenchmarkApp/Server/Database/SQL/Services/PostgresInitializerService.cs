@@ -23,12 +23,12 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.Database.MigrateAsync(cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // await EmptyDatabase(cancellationToken, context);
+            await EmptyDatabase(cancellationToken, context);
 
             if (!context.Users.Any()) await AddDataSet(context);
         }
 
-        private async Task EmptyDatabase(CancellationToken cancellationToken, SqlDatabaseContext context)
+        private static async Task EmptyDatabase(CancellationToken cancellationToken, SqlDatabaseContext context)
         {
             context.Friendships.RemoveRange(context.Friendships);
             context.Users.RemoveRange(context.Users);
@@ -49,44 +49,40 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             };
 
             await context.Users.AddAsync(firstUser);
-
-            var level1Friends = GenerateFriends(firstUser, 9, 1);
-            await context.Users.AddRangeAsync(level1Friends);
-
-            foreach (var level1Friend in level1Friends)
-            {
-                var level2Friends = GenerateFriends(level1Friend, 10, 2);
-                await context.Users.AddRangeAsync(level2Friends);
-
-                foreach (var level2Friend in level2Friends)
-                {
-                    var level3Friends = GenerateFriends(level2Friend, 10, 3);
-                    await context.Users.AddRangeAsync(level3Friends);
-
-                    foreach (var level3Friend in level3Friends)
-                    {
-                        var level4Friends = GenerateFriends(level3Friend, 10, 4);
-                        await context.Users.AddRangeAsync(level4Friends);
-
-                        foreach (var level4Friend in level4Friends)
-                        {
-                            var level5Friends = GenerateFriends(level4Friend, 10, 5);
-                            await context.Users.AddRangeAsync(level5Friends);
-
-                            foreach (var level5Friend in level5Friends)
-                            {
-                                var level6Friends = GenerateFriends(level5Friend, 10, 6);
-                                await context.Users.AddRangeAsync(level6Friends);
-                            }
-                        }
-                    }
-                }
-            }
+            await AddFriendRecursively(context, firstUser, 10, 3, 0);
 
             await context.SaveChangesAsync();
         }
 
-        private List<SqlUserEntity> GenerateFriends(SqlUserEntity rootFriend,
+        /// <summary>
+        /// adds nested user entities to database until given level is reached
+        /// </summary>
+        /// <param name="context">database context to add entities to</param>
+        /// <param name="root">first user entity</param>
+        /// <param name="howMany">number of new entities to be added</param>
+        /// <param name="level">how many levels deep entities should be nested</param>
+        /// <param name="currentDepth">current level of function call</param>
+        private static async Task AddFriendRecursively(
+            SqlDatabaseContext context,
+            SqlUserEntity root,
+            int howMany,
+            int level,
+            int currentDepth)
+        {
+            var friends = GenerateFriends(root, howMany, currentDepth);
+            await context.Users.AddRangeAsync(friends);
+
+            if (level >= currentDepth)
+            {
+                foreach (var friend in friends)
+                {
+                    await AddFriendRecursively(context, friend, 10, level, ++currentDepth);
+                }
+            }
+        }
+
+        private static List<SqlUserEntity> GenerateFriends(
+            SqlUserEntity rootFriend,
             int howMany,
             int level)
         {
