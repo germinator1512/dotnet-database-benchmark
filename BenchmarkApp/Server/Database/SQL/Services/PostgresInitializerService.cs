@@ -24,8 +24,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.SaveChangesAsync(cancellationToken);
 
             // await EmptyDatabase(cancellationToken, context);
-
-            if (!context.Users.Any()) await AddDataSet(context);
+            //
+            // if (!context.Users.Any()) await AddDataSet(context);
         }
 
         private async Task EmptyDatabase(CancellationToken cancellationToken, SqlDatabaseContext context)
@@ -39,7 +39,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         /// adds one million user entities to database which are nested 6 levels deep
         /// </summary>
         /// <param name="context"></param>
-        private async Task AddDataSet(SqlDatabaseContext context)
+        private static async Task AddDataSet(SqlDatabaseContext context)
         {
             Console.WriteLine("No entities found in PostgresDb - Inserting Test Dataset");
 
@@ -86,7 +86,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.SaveChangesAsync();
         }
 
-        private List<SqlUserEntity> GenerateFriends(SqlUserEntity rootFriend,
+        private static List<SqlUserEntity> GenerateFriends(SqlUserEntity rootFriend,
             int howMany,
             int level)
         {

@@ -28,7 +28,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        private async Task AddDataSet(MongoDatabaseContext context)
+        private static async Task AddDataSet(MongoDatabaseContext context)
         {
             Console.WriteLine("No entities found in MongoDB - Inserting Test Dataset");
 
