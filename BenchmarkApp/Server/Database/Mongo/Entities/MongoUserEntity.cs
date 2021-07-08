@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Mongo.Services;
 using MongoDB.Bson;
@@ -15,15 +14,12 @@ namespace BenchmarkApp.Server.Database.Mongo.Entities
 
         public string Name { get; init; }
 
-        public IEnumerable<MongoDBRef> FriendShipRefs { get; } = new List<MongoDBRef>();
+        [BsonIgnore]
+        public IList<MongoFriendShipEntity> FriendShips { get; private set; } = new List<MongoFriendShipEntity>();
 
-        [BsonIgnore] public IList<MongoFriendShipEntity> FriendShips { get; private set; } = new List<MongoFriendShipEntity>();
-        
         public async Task LoadFriendShips(MongoDatabaseContext context)
-        {
-            var filterDef = new FilterDefinitionBuilder<MongoFriendShipEntity>();
-            var filter = filterDef.In(_ => _.Id, FriendShipRefs.Select(f => f.Id));
-            FriendShips = await context.FriendShips.Find(filter).ToListAsync();
-        }
+            => FriendShips = await context.FriendShips
+                .Find(f => f.FriendARef.Id == Id)
+                .ToListAsync();
     }
 }

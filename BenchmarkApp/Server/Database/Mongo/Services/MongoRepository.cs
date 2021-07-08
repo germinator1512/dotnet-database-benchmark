@@ -19,17 +19,31 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 .SingleAsync();
 
             await user.LoadFriendShips(_ctx);
-            foreach (var entity in user.FriendShips)
+            foreach (var friendShip in user.FriendShips)
             {
-                await entity.LoadFriend(_ctx);
-            }
-
-            if (level > 0)
-            {
-                
+                await LoadFriendsRecursively(friendShip, level, 0);
             }
 
             return user.FriendShips;
+        }
+
+        private async Task<MongoFriendShipEntity> LoadFriendsRecursively(
+            MongoFriendShipEntity root,
+            int level,
+            int currentDepth)
+        {
+            await root.LoadFriend(_ctx);
+
+            if (level > currentDepth)
+            {
+                await root.FriendB.LoadFriendShips(_ctx);
+                foreach (var friendship in root.FriendB.FriendShips)
+                {
+                    return await LoadFriendsRecursively(friendship, level, ++currentDepth);
+                }
+            }
+
+            return root;
         }
     }
 }

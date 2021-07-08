@@ -11,13 +11,14 @@ namespace BenchmarkApp.Server.Database.Mongo.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public MongoDBRef FriendRef { get; set; }
+        public MongoDBRef FriendARef { get; init; }
+        public MongoDBRef FriendBRef { get; init; }
 
-        [BsonIgnore] private MongoUserEntity Friend { get; set; }
+        [BsonIgnore] public MongoUserEntity FriendB { get; set; }
 
         public async Task LoadFriend(MongoDatabaseContext context)
-            => Friend = await context.Users
-                .Find(f => f.Id == FriendRef.Id)
+            => FriendB = await context.Users
+                .Find(f => f.Id == FriendBRef.Id)
                 .SingleAsync();
     }
 }

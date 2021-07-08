@@ -22,7 +22,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var context = scope.ServiceProvider.GetRequiredService<SqlDatabaseContext>();
             await context.Database.MigrateAsync(cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
-            
+
             // await EmptyDatabase(cancellationToken, context);
 
             if (!context.Users.Any()) await AddDataSet(context);
@@ -34,7 +34,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             context.Users.RemoveRange(context.Users);
             await context.SaveChangesAsync(cancellationToken);
         }
-        
+
         /// <summary>
         /// adds one million user entities to database which are nested 6 levels deep
         /// </summary>
