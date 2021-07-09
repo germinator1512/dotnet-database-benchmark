@@ -23,16 +23,16 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             {
                 result = await session.ReadTransactionAsync(async tx =>
                 {
-                    var products = new List<string>();
+                    var users = new List<string>();
 
                     var reader = await tx.RunAsync(query);
 
                     while (await reader.FetchAsync())
                     {
-                        products.Add(reader.Current[0].ToString());
+                        users.Add(reader.Current[0].ToString());
                     }
 
-                    return products;
+                    return users;
                 });
             }
             catch (Exception e)
