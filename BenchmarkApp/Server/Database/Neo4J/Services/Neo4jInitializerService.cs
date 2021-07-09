@@ -18,14 +18,36 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<Neo4JDatabaseContext>();
             var repository = scope.ServiceProvider.GetRequiredService<INeo4JRepository>();
+
             var entities = await repository.GetAllEntitiesAsync();
-            if (!entities.Any())
-                AddDataSet(repository);
             
+            await EmptyDatabase(context);
+            
+            if (!entities.Any()) AddDataSet(repository);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        private static async Task EmptyDatabase(Neo4JDatabaseContext context)
+        {
+            var query = "MATCH (n) DETACH DELETE n";
+            var session = context.Driver.AsyncSession();
+
+            try
+            {
+                var result = await session.RunAsync(query);
+                Console.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
+        }
 
         private static void AddDataSet(INeo4JRepository repository)
         {
@@ -41,5 +63,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 Name = "Erika Mustermann"
             };
         }
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

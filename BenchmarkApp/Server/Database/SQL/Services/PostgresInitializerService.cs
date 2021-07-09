@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.SQL.Entities;
@@ -23,12 +22,13 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.Database.MigrateAsync(cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // await EmptyDatabase(cancellationToken, context);
-            //
-            // if (!context.Users.Any()) await AddDataSet(context);
+            // await EmptyDatabase(context, cancellationToken);
+
+            var user = await context.Users.FirstAsync(cancellationToken);
+            if (user == null) await AddDataSet(context);
         }
 
-        private async Task EmptyDatabase(CancellationToken cancellationToken, SqlDatabaseContext context)
+        private static async Task EmptyDatabase(SqlDatabaseContext context, CancellationToken cancellationToken)
         {
             context.Friendships.RemoveRange(context.Friendships);
             context.Users.RemoveRange(context.Users);
