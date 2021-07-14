@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Mongo.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +15,14 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     {
         private readonly IServiceProvider _serviceProvider;
 
+        private const string CreateUserQuery =
+            "CREATE (user:User {name: $name, id: $id}) RETURN user, id(user) as userId";
+
+        private const string CreateRelQuery =
+            "MATCH(a:User),(b:User) WHERE a.id = $idA AND b.id = $idB CREATE (a)-[r:KNOWS {name: a.name + '->' + b.name}]->(b) RETURN type(r), r.name";
+
+
+        private const string EmptyDbQuery = "MATCH (n) DETACH DELETE n";
         public Neo4JInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -26,7 +33,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
             var entities = await repository.GetAllEntitiesAsync();
 
-            await EmptyDatabase(context);
+            // await EmptyDatabase(context);
 
             if (!entities.Any())
                 await AddDataSet(context);
@@ -35,12 +42,11 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         private static async Task EmptyDatabase(Neo4JDatabaseContext context)
         {
-            const string query = "MATCH (n) DETACH DELETE n";
             var session = context.Driver.AsyncSession();
 
             try
             {
-                var result = await session.RunAsync(query);
+                var result = await session.RunAsync(EmptyDbQuery);
                 Console.WriteLine(result);
             }
             catch (Exception e)
@@ -59,20 +65,53 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
 
             var session = context.Driver.AsyncSession();
-            const string createUserQuery = "CREATE (user:User {name: $name}) RETURN user, id(user) as userId";
-            const string createRelationShipQuery =
-                "MATCH(a:User),(b:User) WHERE a.name = 'A' AND b.name = 'B' CREATE (a)-[r:KNOWS {name: a.name + '->' + b.name}]->(b) RETURN type(r), r.name";
+
+            const string firstName = "Max Mustermann";
+            var firstUser = new Neo4jUserEntity
+            {
+                Name = firstName,
+                Id = Guid.NewGuid().ToString()
+            };
+
             try
             {
-                await session.WriteTransactionAsync(
-                    async tx => { await tx.RunAsync(createUserQuery, new {name = "Max Mustermann"}); });
+                await session.WriteTransactionAsync(async tx =>
+                {
+                    await tx.RunAsync(CreateUserQuery, firstUser.ToParameters());
+                });
 
 
                 var level1Friends = GenerateFriends(9, 1);
+              
+                
                 foreach (var level1Friend in level1Friends)
                 {
-                    await session.WriteTransactionAsync(
-                        async tx => { await tx.RunAsync(createUserQuery, new {name = level1Friend.Name}); });
+                    await InsertFriends(session, firstUser, level1Friend);
+                    var level2Friends = GenerateFriends( 10, 2);
+            
+                    foreach (var level2Friend in level2Friends)
+                    {
+                        await InsertFriends(session, level1Friend, level2Friend);
+                        var level3Friends = GenerateFriends( 10, 3);
+                
+                        foreach (var level3Friend in level3Friends)
+                        {
+                            await InsertFriends(session, level2Friend, level3Friend);
+                            var level4Friends = GenerateFriends( 10, 4);
+                        
+                            foreach (var level4Friend in level4Friends)
+                            {
+                                await InsertFriends(session, level3Friend, level4Friend);
+                                var level5Friends = GenerateFriends( 10, 5);
+                            
+                                foreach (var level5Friend in level5Friends)
+                                {
+                                    await InsertFriends(session, level4Friend, level5Friend);
+                                    var level6Friends = GenerateFriends( 10, 6);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception e)
@@ -83,40 +122,20 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             {
                 await session.CloseAsync();
             }
+        }
 
+        private static async Task InsertFriends(
+            IAsyncSession session,
+            Neo4jUserEntity root,
+            Neo4jUserEntity friend)
+        {
+           
+                await session.WriteTransactionAsync(async tx =>
+                    await tx.RunAsync(CreateUserQuery, friend.ToParameters()));
 
-            // await context.Users.AddRangeAsync(level1Friends);
-            //
-            // foreach (var level1Friend in level1Friends)
-            // {
-            //     var level2Friends = GenerateFriends(level1Friend, 10, 2);
-            //     await context.Users.AddRangeAsync(level2Friends);
-            //
-            //     foreach (var level2Friend in level2Friends)
-            //     {
-            //         var level3Friends = GenerateFriends(level2Friend, 10, 3);
-            //         await context.Users.AddRangeAsync(level3Friends);
-            //     
-            //         foreach (var level3Friend in level3Friends)
-            //         {
-            //             var level4Friends = GenerateFriends(level3Friend, 10, 4);
-            //             await context.Users.AddRangeAsync(level4Friends);
-            //     
-            //             foreach (var level4Friend in level4Friends)
-            //             {
-            //                 var level5Friends = GenerateFriends(level4Friend, 10, 5);
-            //                 await context.Users.AddRangeAsync(level5Friends);
-            //     
-            //                 foreach (var level5Friend in level5Friends)
-            //                 {
-            //                     var level6Friends = GenerateFriends(level5Friend, 10, 6);
-            //                     await context.Users.AddRangeAsync(level6Friends);
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-            //
+                await session.WriteTransactionAsync(async tx =>
+                    await tx.RunAsync(CreateRelQuery, new {idA = root.Id, idB = friend.Id}));
+            
         }
 
         private static IEnumerable<Neo4jUserEntity> GenerateFriends(
@@ -130,6 +149,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 var friend = new Neo4jUserEntity
                 {
                     Name = $"Level {level} Friend {z}",
+                    Id = Guid.NewGuid().ToString()
                 };
 
                 newFriends.Add(friend);
