@@ -82,32 +82,32 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
 
                 var level1Friends = GenerateFriends(9, 1);
-              
-                
+
+
                 foreach (var level1Friend in level1Friends)
                 {
                     await InsertFriends(session, firstUser, level1Friend);
-                    var level2Friends = GenerateFriends( 10, 2);
-            
+                    var level2Friends = GenerateFriends(10, 2);
+
                     foreach (var level2Friend in level2Friends)
                     {
                         await InsertFriends(session, level1Friend, level2Friend);
-                        var level3Friends = GenerateFriends( 10, 3);
-                
+                        var level3Friends = GenerateFriends(10, 3);
+
                         foreach (var level3Friend in level3Friends)
                         {
                             await InsertFriends(session, level2Friend, level3Friend);
-                            var level4Friends = GenerateFriends( 10, 4);
-                        
+                            var level4Friends = GenerateFriends(10, 4);
+
                             foreach (var level4Friend in level4Friends)
                             {
                                 await InsertFriends(session, level3Friend, level4Friend);
-                                var level5Friends = GenerateFriends( 10, 5);
-                            
+                                var level5Friends = GenerateFriends(10, 5);
+
                                 foreach (var level5Friend in level5Friends)
                                 {
                                     await InsertFriends(session, level4Friend, level5Friend);
-                                    var level6Friends = GenerateFriends( 10, 6);
+                                    var level6Friends = GenerateFriends(10, 6);
                                 }
                             }
                         }
@@ -129,13 +129,11 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             Neo4jUserEntity root,
             Neo4jUserEntity friend)
         {
-           
-                await session.WriteTransactionAsync(async tx =>
-                    await tx.RunAsync(CreateUserQuery, friend.ToParameters()));
+            await session.WriteTransactionAsync(async tx =>
+                await tx.RunAsync(CreateUserQuery, friend.ToParameters()));
 
-                await session.WriteTransactionAsync(async tx =>
-                    await tx.RunAsync(CreateRelQuery, new {idA = root.Id, idB = friend.Id}));
-            
+            await session.WriteTransactionAsync(async tx =>
+                await tx.RunAsync(CreateRelQuery, new {idA = root.Id, idB = friend.Id}));
         }
 
         private static IEnumerable<Neo4jUserEntity> GenerateFriends(
