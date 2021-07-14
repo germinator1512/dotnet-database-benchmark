@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
@@ -23,6 +22,9 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
 
         private const string EmptyDbQuery = "MATCH (n) DETACH DELETE n";
+
+        private const string IsDbEmptyQuery = "MATCH (n) RETURN count(n) as count";
+
         public Neo4JInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -31,14 +33,47 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             var context = scope.ServiceProvider.GetRequiredService<Neo4JDatabaseContext>();
             var repository = scope.ServiceProvider.GetRequiredService<INeo4JRepository>();
 
-            var entities = await repository.GetAllEntitiesAsync();
 
             // await EmptyDatabase(context);
 
-            if (!entities.Any())
-                await AddDataSet(context);
+            var isEmpty = await IsDatabaseEmpty(context);
+            if (isEmpty) await AddDataSet(context);
         }
 
+
+        private static async Task<bool> IsDatabaseEmpty(Neo4JDatabaseContext context)
+        {
+            var session = context.Driver.AsyncSession();
+
+            try
+            {
+                var result = await session.ReadTransactionAsync(async tx =>
+                {
+                    var reader = await tx.RunAsync(IsDbEmptyQuery);
+
+                    var count = 0.0;
+                    while (await reader.FetchAsync())
+                    {
+                        count = (long) reader.Current[0];
+                    }
+
+                    return count;
+                });
+
+                Console.WriteLine(result);
+                return result == 0;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
+
+            return false;
+        }
 
         private static async Task EmptyDatabase(Neo4JDatabaseContext context)
         {

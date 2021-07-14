@@ -14,7 +14,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public async Task<IEnumerable<Neo4jUserEntity>> GetAllEntitiesAsync()
         {
-            var query = "MATCH (entity:Entity) RETURN entity";
+            var query = "MATCH (user:User) RETURN user";
 
             List<string> result = null;
             var session = _ctx.Driver.AsyncSession();
