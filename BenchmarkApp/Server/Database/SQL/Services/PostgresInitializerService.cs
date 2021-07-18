@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +47,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             var firstUser = new SqlUserEntity
             {
-                Name = "Max Mustermann"
+                Name = EntityConfig.RootUserName
             };
 
             await context.Users.AddAsync(firstUser);
@@ -86,28 +88,29 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.SaveChangesAsync();
         }
 
-        private static List<SqlUserEntity> GenerateFriends(
+        private static IEnumerable<SqlUserEntity> GenerateFriends(
             SqlUserEntity rootFriend,
             int howMany,
             int level)
         {
-            var newFriends = new List<SqlUserEntity>();
-            for (var z = 1; z <= howMany; z++)
-            {
-                var friend = new SqlUserEntity
+            return Enumerable
+                .Range(1, howMany)
+                .Select(z =>
                 {
-                    Name = $"Level {level} Friend {z}"
-                };
-                rootFriend.FriendShips.Add(new SqlFriendshipEntity
-                {
-                    FriendA = rootFriend,
-                    FriendB = friend
-                });
-                newFriends.Add(friend);
-            }
+                    var friend = new SqlUserEntity
+                    {
+                        Name = EntityConfig.UserName(level, z),
+                    };
 
-            return newFriends;
+                    rootFriend.FriendShips.Add(new SqlFriendshipEntity
+                    {
+                        FriendA = rootFriend,
+                        FriendB = friend
+                    });
+                    return friend;
+                });
         }
+
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,7 +38,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             var firstUser = new MongoUserEntity
             {
-                Name = "Max Mustermann",
+                Name = EntityConfig.RootUserName,
             };
 
             await users.InsertOneAsync(firstUser);
@@ -97,42 +98,23 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             }
         }
 
-        private static List<MongoUserEntity> GenerateFriends(
+        private static IEnumerable<MongoUserEntity> GenerateFriends(
             int howMany,
             int level)
-        {
-            var newFriends = new List<MongoUserEntity>();
-
-            for (var z = 1; z <= howMany; z++)
-            {
-                var friend = new MongoUserEntity
+            => Enumerable
+                .Range(1, howMany)
+                .Select(z => new MongoUserEntity
                 {
-                    Name = $"Level {level} Friend {z}",
-                };
-
-                newFriends.Add(friend);
-            }
-
-            return newFriends;
-        }
+                    Name = EntityConfig.UserName(level, z),
+                });
 
         private static IEnumerable<MongoFriendShipEntity> GenerateFriendShips(
             MongoUserEntity rootFriend,
             IEnumerable<MongoUserEntity> friends)
-        {
-            var newFriends = new List<MongoFriendShipEntity>();
-            foreach (var friend in friends)
+            => friends.Select(f => new MongoFriendShipEntity
             {
-                var friendShip = new MongoFriendShipEntity
-                {
-                    FriendARef = new MongoDBRef("users", rootFriend.Id),
-                    FriendBRef = new MongoDBRef("users", friend.Id),
-                };
-
-                newFriends.Add(friendShip);
-            }
-
-            return newFriends;
-        }
+                FriendARef = new MongoDBRef("users", rootFriend.Id),
+                FriendBRef = new MongoDBRef("users", f.Id),
+            });
     }
 }
