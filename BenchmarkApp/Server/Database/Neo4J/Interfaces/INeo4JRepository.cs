@@ -6,6 +6,6 @@ namespace BenchmarkApp.Server.Database.Neo4J.Interfaces
 {
     public interface INeo4JRepository
     {
-        Task<IEnumerable<Neo4jUserEntity>> GetAllFriendsAsync(int level);
+        Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level);
     }
 }

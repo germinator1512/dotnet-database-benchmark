@@ -14,7 +14,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private IGraphClient _client;
-        
+
         public Neo4JInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Match("(n)")
                 .DetachDelete("n")
                 .ExecuteWithoutResultsAsync();
-        
+
         private async Task InsertSingleUser(Neo4JUserEntity single)
             => await _client.Cypher
                 .Create("(user:User {name: $name, id: $id})")
@@ -57,6 +57,21 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Unwind(friends, "friend")
                 .Merge("(user:User {name: friend.name, id: friend.id}) <-[:KNOWS]-(root)")
                 .WithParam("rootId", rootUser.Id)
+                .ExecuteWithoutResultsAsync();
+
+        private async Task InsertUsers(IEnumerable<Neo4JUserEntity> friends)
+            => await _client.Cypher
+                .Unwind(friends, "friend")
+                .Merge("(user:User {name: friend.name, id: friend.id})")
+                .ExecuteWithoutResultsAsync();
+
+        private async Task InsertRelationShips(IEnumerable<Neo4JRelEntity> relationShips)
+            => await _client.Cypher
+                .Unwind(relationShips, "rel")
+                .Match("(root:User)", "(friend:User)")
+                .Where("root.id = rel.rootId")
+                .AndWhere("friend.id = rel.friendId")
+                .Create("(root)-[:KNOWS]->(friend)")
                 .ExecuteWithoutResultsAsync();
 
         private async Task AddDataSet()
@@ -75,39 +90,36 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             var level1Friends = GenerateFriends(9, 1);
             await InsertUsersAsFriends(firstUser, level1Friends);
 
+            foreach (var level1Friend in level1Friends)
+            {
+                var level2Friends = GenerateFriends(10, 2);
+                await InsertUsersAsFriends(level1Friend, level2Friends);
+                
+                foreach (var level2Friend in level2Friends)
+                {
+                    var level3Friends = GenerateFriends(10, 3);
+                    await InsertUsersAsFriends(level2Friend, level3Friends);
+                    
+                    foreach (var level3Friend in level3Friends)
+                    {
+                        var level4Friends = GenerateFriends(10, 4);
+                        await InsertUsersAsFriends(level3Friend, level4Friends);
 
-            // foreach (var level1Friend in level1Friends)
-            // {
-            //     await InsertFriends(session, firstUser, level1Friend);
-            //     var level2Friends = GenerateFriends(10, 2);
-            //
-            //     foreach (var level2Friend in level2Friends)
-            //     {
-            //         await InsertFriends(session, level1Friend, level2Friend);
-            //         var level3Friends = GenerateFriends(10, 3);
-            //
-            //         foreach (var level3Friend in level3Friends)
-            //         {
-            //             await InsertFriends(session, level2Friend, level3Friend);
-            //             var level4Friends = GenerateFriends(10, 4);
-            //
-            //             foreach (var level4Friend in level4Friends)
-            //             {
-            //                 await InsertFriends(session, level3Friend, level4Friend);
-            //                 var level5Friends = GenerateFriends(10, 5);
-            //
-            //                 foreach (var level5Friend in level5Friends)
-            //                 {
-            //                     await InsertFriends(session, level4Friend, level5Friend);
-            //                     var level6Friends = GenerateFriends(10, 6);
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
+                        foreach (var level4Friend in level4Friends)
+                        {
+                            var level5Friends = GenerateFriends(10, 5);
+                            await InsertUsersAsFriends(level4Friend, level5Friends);
+                            
+                            foreach (var level5Friend in level5Friends)
+                            {
+                                var level6Friends = GenerateFriends(10, 6);
+                                await InsertUsersAsFriends(level5Friend, level6Friends);
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-
 
         private static IEnumerable<Neo4JUserEntity> GenerateFriends(
             int howMany,
@@ -128,6 +140,14 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
             return newFriends;
         }
+
+        private static IEnumerable<Neo4JRelEntity> GenerateRels(
+            Neo4JUserEntity root,
+            IEnumerable<Neo4JUserEntity> friends)
+            => friends
+                .Select(friend => new Neo4JRelEntity {RootId = root.Id, FriendId = friend.Id})
+                .ToList();
+
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }

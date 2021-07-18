@@ -86,7 +86,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.SaveChangesAsync();
         }
 
-        private static List<SqlUserEntity> GenerateFriends(SqlUserEntity rootFriend,
+        private static List<SqlUserEntity> GenerateFriends(
+            SqlUserEntity rootFriend,
             int howMany,
             int level)
         {
