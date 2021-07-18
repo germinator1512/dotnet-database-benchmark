@@ -12,7 +12,7 @@ namespace BenchmarkApp.Server.Services
 
         public async Task<BenchmarkResult> StartBenchmark()
         {
-            var entities = await _neo4JRepository.GetAllEntitiesAsync();
+            var entities = await _neo4JRepository.GetAllFriendsAsync(3);
             return new BenchmarkResult
             {
                 Success = true

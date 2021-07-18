@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
+using Neo4j.Driver;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
@@ -12,28 +13,28 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public Neo4JRepository(Neo4JDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<Neo4jUserEntity>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<Neo4jUserEntity>> GetAllFriendsAsync(int level)
         {
-            var query = "MATCH (user:User) RETURN user";
+            const string query =
+                "MATCH (user:User {name: $name}) -[:KNOWS] -> (friend:User) return friend";
 
-            List<string> result = null;
             var session = _ctx.Driver.AsyncSession();
-
-            try 
+            var friends = new List<Neo4jUserEntity>();
+            try
             {
-                result = await session.ReadTransactionAsync(async tx =>
+                var executionResult = await session.RunAsync(query, new {name = "Max Mustermann"});
+                var results = await executionResult.ToListAsync();
+
+
+                foreach (var result in results)
                 {
-                    var users = new List<string>();
+                    var props = result[0].As<INode>().Properties;
 
-                    var reader = await tx.RunAsync(query);
+                    var user = new Neo4jUserEntity(props);
+                    friends.Add(user);
+                }
 
-                    while (await reader.FetchAsync())
-                    {
-                        users.Add(reader.Current[0].ToString());
-                    }
-
-                    return users;
-                });
+                return friends;
             }
             catch (Exception e)
             {
@@ -44,12 +45,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 await session.CloseAsync();
             }
 
-            return new List<Neo4jUserEntity>();
-        }
-
-        public Task AddEntitiesAsync(IEnumerable<Neo4jUserEntity> users)
-        {
-            return null;
+            return friends;
         }
     }
 }

@@ -102,11 +102,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             var session = context.Driver.AsyncSession();
 
             const string firstName = "Max Mustermann";
-            var firstUser = new Neo4jUserEntity
-            {
-                Name = firstName,
-                Id = Guid.NewGuid().ToString()
-            };
+            var firstUser = new Neo4jUserEntity(firstName, Guid.NewGuid().ToString());
 
             try
             {
@@ -180,10 +176,10 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             for (var z = 1; z <= howMany; z++)
             {
                 var friend = new Neo4jUserEntity
-                {
-                    Name = $"Level {level} Friend {z}",
-                    Id = Guid.NewGuid().ToString()
-                };
+                (
+                    $"Level {level} Friend {z}",
+                    Guid.NewGuid().ToString()
+                );
 
                 newFriends.Add(friend);
             }
