@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using BenchmarkApp.Server.Database.Mongo.Services;
+using BenchmarkApp.Server.Database.Neo4J;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using BenchmarkApp.Server.Database.Neo4J.Services;
 using BenchmarkApp.Server.Database.SQL.Interfaces;
@@ -13,6 +15,8 @@ using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services;
 using BenchmarkApp.Server.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Neo4jClient;
+using Newtonsoft.Json.Serialization;
 
 namespace BenchmarkApp.Server
 {
@@ -26,6 +30,9 @@ namespace BenchmarkApp.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var config = new Neo4JConfig();
+            _configuration.GetSection("Neo4JConfig").Bind(config);
+            
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -37,8 +44,15 @@ namespace BenchmarkApp.Server
                     .LogTo(Console.WriteLine)
                     .EnableSensitiveDataLogging();
             });
-
-            services.AddTransient<Neo4JDatabaseContext>();
+            
+            var neo4JClient = new GraphClient(new Uri(config.ClientUrl), config.User, config.Password)
+            {
+                JsonContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            
+            neo4JClient.ConnectAsync();
+            
+            services.AddSingleton<IGraphClient>(neo4JClient);
             services.AddTransient<MongoDatabaseContext>();
 
             services.AddTransient<IMongoRepository, MongoRepository>();

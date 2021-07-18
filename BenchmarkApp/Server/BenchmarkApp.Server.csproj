@@ -16,6 +16,7 @@
         </PackageReference>
         <PackageReference Include="Neo4j.Driver" Version="4.3.1" />
         <PackageReference Include="Neo4j.Driver.Extensions" Version="1.0.10" />
+        <PackageReference Include="Neo4jClient" Version="4.1.14" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
     </ItemGroup>
 
