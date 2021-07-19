@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
@@ -26,7 +27,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         }
 
         public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
-            => (await _ctx.Users.Find(_ => true).FirstAsync(cancellationToken)) == null;
+            => !(await _ctx.Users.Find(_ => true).ToListAsync(cancellationToken)).Any();
 
         private async Task<MongoUserEntity> LoadFriendsRecursively(
             MongoUserEntity root,

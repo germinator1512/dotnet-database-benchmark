@@ -28,10 +28,10 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             var repository = scope.ServiceProvider.GetRequiredService<ISqlRepository>();
 
-            // await repository.EmptyDatabase(cancellationToken);
+            await repository.EmptyDatabase(cancellationToken);
 
-            if (await repository.IsDatabaseEmpty(cancellationToken))
-                await AddDataSet();
+            // if (await repository.IsDatabaseEmpty(cancellationToken))
+                // await AddDataSet();
         }
 
 
@@ -67,6 +67,10 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         {
             var friends = GenerateFriends(root, howMany, currentLevel);
             await _context.Users.AddRangeAsync(friends);
+            await _context.SaveChangesAsync();
+
+            var friendShips = GenerateFriendShips(root, friends);
+            await _context.Friendships.AddRangeAsync(friendShips);
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in friends)
@@ -80,21 +84,20 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         {
             return Enumerable
                 .Range(1, howMany)
-                .Select(z =>
+                .Select(z => new SqlUserEntity
                 {
-                    var friend = new SqlUserEntity
-                    {
-                        Name = Config.UserName(level, z),
-                    };
-
-                    rootFriend.FriendShips.Add(new SqlFriendshipEntity
-                    {
-                        FriendA = rootFriend,
-                        FriendB = friend
-                    });
-                    return friend;
+                    Name = Config.UserName(level, z),
                 });
         }
+
+        private static IEnumerable<SqlFriendshipEntity> GenerateFriendShips(
+            SqlUserEntity rootFriend,
+            IEnumerable<SqlUserEntity> friends)
+            => friends.Select(f => new SqlFriendshipEntity
+            {
+                FriendA = rootFriend,
+                FriendB = f
+            });
 
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

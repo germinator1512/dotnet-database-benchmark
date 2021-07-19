@@ -30,7 +30,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             // await _repository.EmptyDatabase();
 
             var isEmpty = await _repository.IsDatabaseEmpty();
-            if (isEmpty) await AddDataSet();
+            // if (isEmpty) await AddDataSet();
         }
 
 

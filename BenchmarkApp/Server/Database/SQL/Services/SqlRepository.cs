@@ -24,7 +24,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         }
 
         public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
-            => (await _ctx.Users.FirstAsync(cancellationToken)) == null;
+            => (await _ctx.Users.SingleOrDefaultAsync(cancellationToken)) == null;
 
         public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
         {
