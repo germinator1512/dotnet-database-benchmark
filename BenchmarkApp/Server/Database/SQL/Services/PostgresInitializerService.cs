@@ -41,12 +41,12 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             var firstUser = new SqlUserEntity
             {
-                Name = EntityConfig.RootUserName
+                Name = Config.RootUserName
             };
 
             await _context.Users.AddAsync(firstUser);
 
-            await AddFriendRecursively(firstUser, 9, EntityConfig.NestedUserLevels, 1);
+            await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
 
             await _context.SaveChangesAsync();
         }
@@ -63,18 +63,14 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             SqlUserEntity root,
             int howMany,
             int nestedLevels,
-            int currentLevel)
+            int currentLevel = 1)
         {
             var friends = GenerateFriends(root, howMany, currentLevel);
             await _context.Users.AddRangeAsync(friends);
 
             if (currentLevel < nestedLevels)
-            {
                 foreach (var friend in friends)
-                {
-                    await AddFriendRecursively(friend, 10, nestedLevels, currentLevel + 1);
-                }
-            }
+                    await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
 
         private static IEnumerable<SqlUserEntity> GenerateFriends(
@@ -88,7 +84,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                 {
                     var friend = new SqlUserEntity
                     {
-                        Name = EntityConfig.UserName(level, z),
+                        Name = Config.UserName(level, z),
                     };
 
                     rootFriend.FriendShips.Add(new SqlFriendshipEntity

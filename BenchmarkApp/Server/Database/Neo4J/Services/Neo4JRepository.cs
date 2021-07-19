@@ -19,7 +19,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         {
             var result = await _client.Cypher
                 .Match(@"(user:User{name: $name})-[:KNOWS]->(friend:User)")
-                .WithParam("name", EntityConfig.RootUserName)
+                .WithParam("name", Config.RootUserName)
                 .Return<Neo4JUserEntity>("friend")
                 .ResultsAsync;
 

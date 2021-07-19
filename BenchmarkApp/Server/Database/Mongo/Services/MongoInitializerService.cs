@@ -36,11 +36,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             var firstUser = new MongoUserEntity
             {
-                Name = EntityConfig.RootUserName,
+                Name = Config.RootUserName,
             };
 
             await _context.Users.InsertOneAsync(firstUser);
-            await AddFriendRecursively(firstUser, 9, EntityConfig.NestedUserLevels, 1);
+            await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             MongoUserEntity root,
             int howMany,
             int nestedLevels,
-            int currentLevel)
+            int currentLevel = 1)
         {
             var friends = GenerateFriends(howMany, currentLevel);
             await _context.Users.InsertManyAsync(friends);
@@ -63,12 +63,8 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             await _context.FriendShips.InsertManyAsync(friendships);
 
             if (currentLevel < nestedLevels)
-            {
                 foreach (var friend in friends)
-                {
-                    await AddFriendRecursively(friend, 10, nestedLevels, currentLevel + 1);
-                }
-            }
+                    await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
 
 
@@ -79,7 +75,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 .Range(1, howMany)
                 .Select(z => new MongoUserEntity
                 {
-                    Name = EntityConfig.UserName(level, z),
+                    Name = Config.UserName(level, z),
                 });
 
         private static IEnumerable<MongoFriendShipEntity> GenerateFriendShips(

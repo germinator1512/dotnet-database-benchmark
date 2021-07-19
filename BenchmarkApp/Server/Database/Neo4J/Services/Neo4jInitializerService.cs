@@ -38,7 +38,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         {
             Console.WriteLine("No entities found in Neo4J - Inserting Test Dataset");
 
-            const string firstName = EntityConfig.RootUserName;
+            const string firstName = Config.RootUserName;
             var firstUser = new Neo4JUserEntity
             {
                 Name = firstName,
@@ -47,7 +47,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
             await _repository.InsertSingleUser(firstUser);
 
-            await AddFriendRecursively(firstUser, 9, EntityConfig.NestedUserLevels, 1);
+            await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
         }
 
         /// <summary>
@@ -61,18 +61,14 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             Neo4JUserEntity root,
             int howMany,
             int nestedLevels,
-            int currentLevel)
+            int currentLevel = 1)
         {
             var friends = GenerateFriends(howMany, currentLevel);
             await _repository.InsertUsersAsFriends(root, friends);
 
             if (currentLevel < nestedLevels)
-            {
                 foreach (var friend in friends)
-                {
-                    await AddFriendRecursively(friend, 10, nestedLevels, currentLevel + 1);
-                }
-            }
+                    await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
 
         private static IEnumerable<Neo4JUserEntity> GenerateFriends(
@@ -82,7 +78,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Range(1, howMany)
                 .Select(z => new Neo4JUserEntity
                 {
-                    Name = EntityConfig.UserName(level, z),
+                    Name = Config.UserName(level, z),
                     Id = Guid.NewGuid().ToString()
                 }).ToList();
 

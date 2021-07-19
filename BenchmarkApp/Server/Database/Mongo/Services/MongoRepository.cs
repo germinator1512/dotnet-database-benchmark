@@ -17,7 +17,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         public async Task<IEnumerable<MongoFriendShipEntity>> GetAllFriendsAsync(int level)
         {
             var user = await _ctx.Users
-                .Find(u => u.Name == EntityConfig.RootUserName)
+                .Find(u => u.Name == Config.RootUserName)
                 .SingleAsync();
 
             await user.LoadFriendShips(_ctx);
