@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.SQL.Entities;
 using BenchmarkApp.Server.Database.SQL.Interfaces;
@@ -13,10 +14,20 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
+        public async Task EmptyDatabase(CancellationToken cancellationToken)
+        {
+            _ctx.Friendships.RemoveRange(_ctx.Friendships);
+            _ctx.Users.RemoveRange(_ctx.Users);
+            await _ctx.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
+            => (await _ctx.Users.FirstAsync(cancellationToken)) == null;
+
+
         public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
         {
             var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals("Max Mustermann"));
-
             return await _ctx.Friendships
                 .Where(f => f.FriendA.Id == firstUser.Id)
                 .Include(f => f.FriendB)

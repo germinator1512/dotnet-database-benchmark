@@ -14,50 +14,24 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     public class Neo4JInitializerService : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
-        private IGraphClient _client;
+        private Neo4JRepository _repository;
 
         public Neo4JInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
-            _client = scope.ServiceProvider.GetRequiredService<IGraphClient>();
+            _repository = scope.ServiceProvider.GetRequiredService<Neo4JRepository>();
 
-            await EmptyDatabase();
+            var client =  scope.ServiceProvider.GetRequiredService<IGraphClient>();
+            await client.ConnectAsync();
 
-            var isEmpty = await IsDatabaseEmpty();
+            await _repository.EmptyDatabase();
+
+            var isEmpty = await _repository.IsDatabaseEmpty();
             if (isEmpty) await AddDataSet();
         }
 
-        private async Task<bool> IsDatabaseEmpty()
-            => (await _client.Cypher
-                    .Match("(n:User)")
-                    .Return(n => n.Count())
-                    .Limit(1)
-                    .ResultsAsync)
-                .Single() == 0;
-
-
-        private async Task EmptyDatabase() =>
-            await _client.Cypher
-                .Match("(n)")
-                .DetachDelete("n")
-                .ExecuteWithoutResultsAsync();
-
-        private async Task InsertSingleUser(Neo4JUserEntity single)
-            => await _client.Cypher
-                .Create("(user:User {name: $name, id: $id})")
-                .WithParams(single.ToMap())
-                .ExecuteWithoutResultsAsync();
-
-        private async Task InsertUsersAsFriends(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
-            => await _client.Cypher
-                .Match("(root:User)")
-                .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)
-                .Unwind(friends, "friend")
-                .Merge("(user:User {name: friend.name, id: friend.id}) <-[:KNOWS]-(root)")
-                .WithParam("rootId", rootUser.Id)
-                .ExecuteWithoutResultsAsync();
 
         private async Task AddDataSet()
         {
@@ -70,35 +44,36 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 Id = Guid.NewGuid().ToString()
             };
 
-            await InsertSingleUser(firstUser);
+            await  _repository.InsertSingleUser(firstUser);
+
 
             var level1Friends = GenerateFriends(9, 1);
-            await InsertUsersAsFriends(firstUser, level1Friends);
+            await  _repository.InsertUsersAsFriends(firstUser, level1Friends);
 
             foreach (var level1Friend in level1Friends)
             {
                 var level2Friends = GenerateFriends(10, 2);
-                await InsertUsersAsFriends(level1Friend, level2Friends);
+                await  _repository.InsertUsersAsFriends(level1Friend, level2Friends);
 
                 foreach (var level2Friend in level2Friends)
                 {
                     var level3Friends = GenerateFriends(10, 3);
-                    await InsertUsersAsFriends(level2Friend, level3Friends);
+                    await  _repository.InsertUsersAsFriends(level2Friend, level3Friends);
 
                     foreach (var level3Friend in level3Friends)
                     {
                         var level4Friends = GenerateFriends(10, 4);
-                        await InsertUsersAsFriends(level3Friend, level4Friends);
+                        await  _repository.InsertUsersAsFriends(level3Friend, level4Friends);
 
                         foreach (var level4Friend in level4Friends)
                         {
                             var level5Friends = GenerateFriends(10, 5);
-                            await InsertUsersAsFriends(level4Friend, level5Friends);
+                            await  _repository.InsertUsersAsFriends(level4Friend, level5Friends);
 
                             foreach (var level5Friend in level5Friends)
                             {
                                 var level6Friends = GenerateFriends(10, 6);
-                                await InsertUsersAsFriends(level5Friend, level6Friends);
+                                await  _repository.InsertUsersAsFriends(level5Friend, level6Friends);
                             }
                         }
                     }

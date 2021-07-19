@@ -50,8 +50,6 @@ namespace BenchmarkApp.Server
                 JsonContractResolver = new CamelCasePropertyNamesContractResolver()
             };
             
-            neo4JClient.ConnectAsync();
-            
             services.AddSingleton<IGraphClient>(neo4JClient);
             services.AddTransient<MongoDatabaseContext>();
 

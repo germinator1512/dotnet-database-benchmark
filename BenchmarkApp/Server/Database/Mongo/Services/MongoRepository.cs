@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
 using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using MongoDB.Driver;
@@ -15,7 +17,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         public async Task<IEnumerable<MongoFriendShipEntity>> GetAllFriendsAsync(int level)
         {
             var user = await _ctx.Users
-                .Find(u => u.Name == "Max Mustermann")
+                .Find(u => u.Name == EntityConfig.RootUserName)
                 .SingleAsync();
 
             await user.LoadFriendShips(_ctx);
@@ -55,6 +57,9 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             return user.FriendShips;
         }
+
+        public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
+            => (await _ctx.Users.Find(_ => true).FirstAsync(cancellationToken)) == null;
 
         // private async Task<MongoFriendShipEntity> LoadFriendsRecursively(
         //     MongoFriendShipEntity root,

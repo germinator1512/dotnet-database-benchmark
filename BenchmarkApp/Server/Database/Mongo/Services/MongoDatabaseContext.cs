@@ -6,7 +6,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 {
     public class MongoDatabaseContext
     {
-        public readonly IMongoDatabase Database;
+        private readonly IMongoDatabase _database;
 
         public MongoDatabaseContext(IConfiguration configuration)
         {
@@ -14,11 +14,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             configuration.GetSection("MongoConfig").Bind(config);
 
             var client = new MongoClient(config.DatabaseConnectionString);
-            Database = client.GetDatabase(config.DatabaseName);
+            _database = client.GetDatabase(config.DatabaseName);
         }
 
-        public IMongoCollection<MongoUserEntity> Users => Database.GetCollection<MongoUserEntity>("users");
+        public IMongoCollection<MongoUserEntity> Users => _database.GetCollection<MongoUserEntity>("users");
 
-        public IMongoCollection<MongoFriendShipEntity> FriendShips => Database.GetCollection<MongoFriendShipEntity>("friendShips");
+        public IMongoCollection<MongoFriendShipEntity> FriendShips => _database.GetCollection<MongoFriendShipEntity>("friendShips");
     }
 }

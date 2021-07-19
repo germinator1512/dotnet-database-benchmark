@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
+using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
@@ -21,9 +22,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
+            var repo = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
 
-            var friends = await context.Users.Find(_ => true).ToListAsync(cancellationToken);
-            if (!friends.Any()) await AddDataSet(context);
+            if (await repo.IsDatabaseEmpty(cancellationToken))
+                await AddDataSet(context);
         }
 
 
@@ -55,7 +57,6 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             {
                 var level2Friends = GenerateFriends(10, 2);
                 await users.InsertManyAsync(level2Friends);
-
 
                 var level1FriendShips = GenerateFriendShips(level1Friend, level2Friends);
                 await friendships.InsertManyAsync(level1FriendShips);

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
+using BenchmarkApp.Server.Database.SQL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,18 +25,14 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await context.Database.MigrateAsync(cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            // await EmptyDatabase(context, cancellationToken);
+            var repository = scope.ServiceProvider.GetRequiredService<ISqlRepository>();
 
-            var user = await context.Users.FirstAsync(cancellationToken);
-            if (user == null) await AddDataSet(context);
+            await repository.EmptyDatabase(cancellationToken);
+
+            if (await repository.IsDatabaseEmpty(cancellationToken))
+                await AddDataSet(context);
         }
 
-        private static async Task EmptyDatabase(SqlDatabaseContext context, CancellationToken cancellationToken)
-        {
-            context.Friendships.RemoveRange(context.Friendships);
-            context.Users.RemoveRange(context.Users);
-            await context.SaveChangesAsync(cancellationToken);
-        }
 
         /// <summary>
         /// adds one million user entities to database which are nested 6 levels deep
@@ -51,6 +48,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             };
 
             await context.Users.AddAsync(firstUser);
+
 
             var level1Friends = GenerateFriends(firstUser, 9, 1);
             await context.Users.AddRangeAsync(level1Friends);
