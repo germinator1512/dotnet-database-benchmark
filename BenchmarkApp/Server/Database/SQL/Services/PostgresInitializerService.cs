@@ -30,8 +30,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             await repository.EmptyDatabase(cancellationToken);
 
-            // if (await repository.IsDatabaseEmpty(cancellationToken))
-                // await AddDataSet();
+            if (await repository.IsDatabaseEmpty(cancellationToken))
+                await AddDataSet();
         }
 
 
@@ -65,40 +65,36 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             int nestedLevels,
             int currentLevel = 1)
         {
-            var friends = GenerateFriends(root, howMany, currentLevel);
-            await _context.Users.AddRangeAsync(friends);
-            await _context.SaveChangesAsync();
+            // var friends = GenerateFriends(howMany, currentLevel);
+            // await _context.Users.AddRangeAsync(friends);
+            // await _context.SaveChangesAsync();
 
-            var friendShips = GenerateFriendShips(root, friends);
+            var friendShips = GenerateFriendsWithFriendShips(root, howMany, currentLevel);
             await _context.Friendships.AddRangeAsync(friendShips);
 
             if (currentLevel < nestedLevels)
-                foreach (var friend in friends)
+                foreach (var friend in friendShips.Select(f => f.FriendB))
                     await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
+        
 
-        private static IEnumerable<SqlUserEntity> GenerateFriends(
+        private static IEnumerable<SqlFriendshipEntity> GenerateFriendsWithFriendShips(
             SqlUserEntity rootFriend,
             int howMany,
             int level)
         {
             return Enumerable
                 .Range(1, howMany)
-                .Select(z => new SqlUserEntity
+                .Select(z => new SqlFriendshipEntity
                 {
-                    Name = Config.UserName(level, z),
+                    FriendA = rootFriend,
+                    FriendAId = rootFriend.Id,
+                    FriendB = new SqlUserEntity
+                    {
+                        Name = Config.UserName(level, z),
+                    }
                 });
         }
-
-        private static IEnumerable<SqlFriendshipEntity> GenerateFriendShips(
-            SqlUserEntity rootFriend,
-            IEnumerable<SqlUserEntity> friends)
-            => friends.Select(f => new SqlFriendshipEntity
-            {
-                FriendA = rootFriend,
-                FriendB = f
-            });
-
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
