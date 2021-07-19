@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
 using BenchmarkApp.Server.Database.SQL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -24,32 +26,23 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
             => (await _ctx.Users.FirstAsync(cancellationToken)) == null;
 
-
         public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
         {
-            var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals("Max Mustermann"));
-            return await _ctx.Friendships
-                .Where(f => f.FriendA.Id == firstUser.Id)
-                .Include(f => f.FriendB)
-                .If(level > 0, level1 => level1
+            var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals(Config.RootUserName));
+
+            var query =
+                _ctx.Friendships
+                    .Where(f => f.FriendA.Id == firstUser.Id)
+                    .Include(f => f.FriendB);
+
+            foreach (var _ in Enumerable.Range(0, level))
+            {
+                query
                     .ThenInclude(user => user.FriendShips)
-                    .ThenInclude(f => f.FriendB)
-                    .If(level > 1, level2 => level2
-                        .ThenInclude(user => user.FriendShips)
-                        .ThenInclude(f => f.FriendB)
-                        .If(level > 2, level3 => level3
-                            .ThenInclude(user => user.FriendShips)
-                            .ThenInclude(f => f.FriendB)
-                            .If(level > 3, level4 => level4
-                                .ThenInclude(user => user.FriendShips)
-                                .ThenInclude(f => f.FriendB)
-                                .If(level > 4, level5 => level5
-                                    .ThenInclude(user => user.FriendShips)
-                                    .ThenInclude(f => f.FriendB)
-                                    .If(level > 5, level6 => level6
-                                        .ThenInclude(user => user.FriendShips)
-                                        .ThenInclude(f => f.FriendB)))))))
-                .ToListAsync();
+                    .ThenInclude(f => f.FriendB);
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

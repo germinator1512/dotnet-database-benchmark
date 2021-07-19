@@ -14,7 +14,6 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public Neo4JRepository(IGraphClient client) => _client = client;
 
-
         public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
         {
             var result = await _client.Cypher
@@ -22,8 +21,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .WithParam("name", Config.RootUserName)
                 .Return<Neo4JUserEntity>("friend")
                 .ResultsAsync;
-
-
+            
             return new List<Neo4JUserEntity>();
         }
 
@@ -36,8 +34,8 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Single() == 0;
 
 
-        public async Task EmptyDatabase() =>
-            await _client.Cypher
+        public async Task EmptyDatabase()
+            => await _client.Cypher
                 .Match("(n)")
                 .DetachDelete("n")
                 .ExecuteWithoutResultsAsync();

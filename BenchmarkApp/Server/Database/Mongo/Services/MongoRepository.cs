@@ -20,40 +20,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 .Find(u => u.Name == Config.RootUserName)
                 .SingleAsync();
 
-            await user.LoadFriendShips(_ctx);
-            foreach (var friendShip in user.FriendShips)
-            {
-                await friendShip.LoadFriend(_ctx);
-
-
-                if (level > 0)
-                {
-                    await friendShip.FriendB.LoadFriendShips(_ctx);
-                    foreach (var friendship1 in friendShip.FriendB.FriendShips)
-                    {
-                        await friendship1.LoadFriend(_ctx);
-
-                        if (level > 1)
-                        {
-                            await friendship1.FriendB.LoadFriendShips(_ctx);
-                            foreach (var friendship2 in friendShip.FriendB.FriendShips)
-                            {
-                                await friendship2.LoadFriend(_ctx);
-
-                                if (level > 2)
-                                {
-                                    await friendship2.FriendB.LoadFriendShips(_ctx);
-
-                                    foreach (var friendship3 in friendShip.FriendB.FriendShips)
-                                    {
-                                        await friendship3.LoadFriend(_ctx);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            await LoadFriendsRecursively(user, level);
 
             return user.FriendShips;
         }
@@ -61,23 +28,22 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
             => (await _ctx.Users.Find(_ => true).FirstAsync(cancellationToken)) == null;
 
-        // private async Task<MongoFriendShipEntity> LoadFriendsRecursively(
-        //     MongoFriendShipEntity root,
-        //     int level,
-        //     int currentDepth)
-        // {
-        //     await root.LoadFriend(_ctx);
-        //
-        //     if (level > currentDepth)
-        //     {
-        //         await root.FriendB.LoadFriendShips(_ctx);
-        //         foreach (var friendship in root.FriendB.FriendShips)
-        //         {
-        //             return await LoadFriendsRecursively(friendship, level, ++currentDepth);
-        //         }
-        //     }
-        //
-        //     return root;
-        // }
+        private async Task<MongoUserEntity> LoadFriendsRecursively(
+            MongoUserEntity root,
+            int nestedLevels,
+            int currentLevel = 1)
+        {
+            await root.LoadFriendShips(_ctx);
+            foreach (var friendship in root.FriendShips)
+            {
+                await friendship.LoadFriend(_ctx);
+                if (currentLevel < nestedLevels)
+                {
+                    return await LoadFriendsRecursively(friendship.FriendB, nestedLevels, currentLevel + 1);
+                }
+            }
+
+            return root;
+        }
     }
 }
