@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
+using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Neo4jClient;
@@ -14,16 +15,16 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     public class Neo4JInitializerService : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
-        private Neo4JRepository _repository;
+        private INeo4JRepository _repository;
 
         public Neo4JInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
-            _repository = scope.ServiceProvider.GetRequiredService<Neo4JRepository>();
+            _repository = scope.ServiceProvider.GetRequiredService<INeo4JRepository>();
 
-            var client =  scope.ServiceProvider.GetRequiredService<IGraphClient>();
+            var client = scope.ServiceProvider.GetRequiredService<IGraphClient>();
             await client.ConnectAsync();
 
             await _repository.EmptyDatabase();
@@ -44,39 +45,32 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 Id = Guid.NewGuid().ToString()
             };
 
-            await  _repository.InsertSingleUser(firstUser);
+            await _repository.InsertSingleUser(firstUser);
 
+            await AddFriendRecursively(firstUser, 9, EntityConfig.NestedUserLevels, 1);
+        }
 
-            var level1Friends = GenerateFriends(9, 1);
-            await  _repository.InsertUsersAsFriends(firstUser, level1Friends);
+        /// <summary>
+        /// adds nested user entities to database until given level is reached
+        /// </summary>
+        /// <param name="root">first user entity</param>
+        /// <param name="howMany">number of new entities to be added to friends list of root user</param>
+        /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
+        /// <param name="currentLevel">current level of function call</param>
+        private async Task AddFriendRecursively(
+            Neo4JUserEntity root,
+            int howMany,
+            int nestedLevels,
+            int currentLevel)
+        {
+            var friends = GenerateFriends(howMany, currentLevel);
+            await _repository.InsertUsersAsFriends(root, friends);
 
-            foreach (var level1Friend in level1Friends)
+            if (currentLevel < nestedLevels)
             {
-                var level2Friends = GenerateFriends(10, 2);
-                await  _repository.InsertUsersAsFriends(level1Friend, level2Friends);
-
-                foreach (var level2Friend in level2Friends)
+                foreach (var friend in friends)
                 {
-                    var level3Friends = GenerateFriends(10, 3);
-                    await  _repository.InsertUsersAsFriends(level2Friend, level3Friends);
-
-                    foreach (var level3Friend in level3Friends)
-                    {
-                        var level4Friends = GenerateFriends(10, 4);
-                        await  _repository.InsertUsersAsFriends(level3Friend, level4Friends);
-
-                        foreach (var level4Friend in level4Friends)
-                        {
-                            var level5Friends = GenerateFriends(10, 5);
-                            await  _repository.InsertUsersAsFriends(level4Friend, level5Friends);
-
-                            foreach (var level5Friend in level5Friends)
-                            {
-                                var level6Friends = GenerateFriends(10, 6);
-                                await  _repository.InsertUsersAsFriends(level5Friend, level6Friends);
-                            }
-                        }
-                    }
+                    await AddFriendRecursively(friend, 10, nestedLevels, currentLevel + 1);
                 }
             }
         }

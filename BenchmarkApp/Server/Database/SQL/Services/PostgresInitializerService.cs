@@ -15,30 +15,27 @@ namespace BenchmarkApp.Server.Database.SQL.Services
     public class PostgresInitializerService : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
+        private SqlDatabaseContext _context;
 
         public PostgresInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<SqlDatabaseContext>();
-            await context.Database.MigrateAsync(cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
+            _context = scope.ServiceProvider.GetRequiredService<SqlDatabaseContext>();
+            await _context.Database.MigrateAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             var repository = scope.ServiceProvider.GetRequiredService<ISqlRepository>();
 
-            await repository.EmptyDatabase(cancellationToken);
+            // await repository.EmptyDatabase(cancellationToken);
 
             if (await repository.IsDatabaseEmpty(cancellationToken))
-                await AddDataSet(context);
+                await AddDataSet();
         }
 
 
-        /// <summary>
-        /// adds one million user entities to database which are nested 6 levels deep
-        /// </summary>
-        /// <param name="context"></param>
-        private static async Task AddDataSet(SqlDatabaseContext context)
+        private async Task AddDataSet()
         {
             Console.WriteLine("No entities found in PostgresDb - Inserting Test Dataset");
 
@@ -47,43 +44,37 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                 Name = EntityConfig.RootUserName
             };
 
-            await context.Users.AddAsync(firstUser);
+            await _context.Users.AddAsync(firstUser);
+
+            await AddFriendRecursively(firstUser, 9, EntityConfig.NestedUserLevels, 1);
+
+            await _context.SaveChangesAsync();
+        }
 
 
-            var level1Friends = GenerateFriends(firstUser, 9, 1);
-            await context.Users.AddRangeAsync(level1Friends);
+        /// <summary>
+        /// adds nested user entities to database until given level is reached
+        /// </summary>
+        /// <param name="root">first user entity</param>
+        /// <param name="howMany">number of new entities to be added to friends list of root user</param>
+        /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
+        /// <param name="currentLevel">current level of function call</param>
+        private async Task AddFriendRecursively(
+            SqlUserEntity root,
+            int howMany,
+            int nestedLevels,
+            int currentLevel)
+        {
+            var friends = GenerateFriends(root, howMany, currentLevel);
+            await _context.Users.AddRangeAsync(friends);
 
-            foreach (var level1Friend in level1Friends)
+            if (currentLevel < nestedLevels)
             {
-                var level2Friends = GenerateFriends(level1Friend, 10, 2);
-                await context.Users.AddRangeAsync(level2Friends);
-
-                foreach (var level2Friend in level2Friends)
+                foreach (var friend in friends)
                 {
-                    var level3Friends = GenerateFriends(level2Friend, 10, 3);
-                    await context.Users.AddRangeAsync(level3Friends);
-
-                    foreach (var level3Friend in level3Friends)
-                    {
-                        var level4Friends = GenerateFriends(level3Friend, 10, 4);
-                        await context.Users.AddRangeAsync(level4Friends);
-
-                        foreach (var level4Friend in level4Friends)
-                        {
-                            var level5Friends = GenerateFriends(level4Friend, 10, 5);
-                            await context.Users.AddRangeAsync(level5Friends);
-
-                            foreach (var level5Friend in level5Friends)
-                            {
-                                var level6Friends = GenerateFriends(level5Friend, 10, 6);
-                                await context.Users.AddRangeAsync(level6Friends);
-                            }
-                        }
-                    }
+                    await AddFriendRecursively(friend, 10, nestedLevels, currentLevel + 1);
                 }
             }
-
-            await context.SaveChangesAsync();
         }
 
         private static IEnumerable<SqlUserEntity> GenerateFriends(
