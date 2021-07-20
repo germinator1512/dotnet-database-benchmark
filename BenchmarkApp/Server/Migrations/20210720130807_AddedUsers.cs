@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BenchmarkApp.Server.Migrations
 {
-    public partial class AddedEntities : Migration
+    public partial class AddedUsers : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
