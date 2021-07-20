@@ -23,9 +23,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             var scope = _serviceProvider.CreateScope();
             _context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
-            var repo = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
+            var repository = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
 
-            if (await repo.IsDatabaseEmpty(cancellationToken))
+            await repository.EmptyDatabase(cancellationToken);
+
+            if (await repository.IsDatabaseEmpty(cancellationToken))
                 await AddDataSet();
         }
 
@@ -56,36 +58,30 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             int nestedLevels,
             int currentLevel = 1)
         {
-            var friends = GenerateFriends(howMany, currentLevel);
+            List<MongoUserEntity> GenerateFriends() => Enumerable
+                .Range(1, howMany)
+                .Select(z => new MongoUserEntity {Name = Config.UserName(currentLevel, z),})
+                .ToList();
+
+            var friends = GenerateFriends();
             await _context.Users.InsertManyAsync(friends);
 
-            var friendships = GenerateFriendShips(root, friends);
+            List<MongoFriendShipEntity> GenerateFriendShips()
+                => friends.Select(f => new MongoFriendShipEntity
+                    {
+                        FriendARef = new MongoDBRef("users", root.Id),
+                        FriendBRef = new MongoDBRef("users", f.Id),
+                    })
+                    .ToList();
+
+            var friendships = GenerateFriendShips();
+
             await _context.FriendShips.InsertManyAsync(friendships);
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in friends)
                     await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
-
-
-        private static IEnumerable<MongoUserEntity> GenerateFriends(
-            int howMany,
-            int level)
-            => Enumerable
-                .Range(1, howMany)
-                .Select(z => new MongoUserEntity
-                {
-                    Name = Config.UserName(level, z),
-                });
-
-        private static IEnumerable<MongoFriendShipEntity> GenerateFriendShips(
-            MongoUserEntity rootFriend,
-            IEnumerable<MongoUserEntity> friends)
-            => friends.Select(f => new MongoFriendShipEntity
-            {
-                FriendARef = new MongoDBRef("users", rootFriend.Id),
-                FriendBRef = new MongoDBRef("users", f.Id),
-            });
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }

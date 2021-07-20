@@ -3,16 +3,15 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Mongo.Services;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Entities
 {
     public class MongoUserEntity
     {
-        [BsonId(IdGenerator = typeof(ObjectIdGenerator))]
+        [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; init; }
 

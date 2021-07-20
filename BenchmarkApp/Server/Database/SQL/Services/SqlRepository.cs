@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,8 +22,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await _ctx.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
-            => (await _ctx.Users.SingleOrDefaultAsync(cancellationToken)) == null;
+        public bool IsDatabaseEmpty(CancellationToken cancellationToken) => !_ctx.Users.Any();
 
         public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
         {

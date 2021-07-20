@@ -29,6 +29,12 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
             => !(await _ctx.Users.Find(_ => true).ToListAsync(cancellationToken)).Any();
 
+        public async Task EmptyDatabase(CancellationToken cancellationToken)
+        {
+            await _ctx.Users.DeleteManyAsync(u => true, cancellationToken);
+            await _ctx.FriendShips.DeleteManyAsync(u => true, cancellationToken);
+        }
+
         private async Task<MongoUserEntity> LoadFriendsRecursively(
             MongoUserEntity root,
             int nestedLevels,

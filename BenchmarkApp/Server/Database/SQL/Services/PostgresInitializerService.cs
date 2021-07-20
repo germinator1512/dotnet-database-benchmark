@@ -28,9 +28,9 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             var repository = scope.ServiceProvider.GetRequiredService<ISqlRepository>();
 
-            await repository.EmptyDatabase(cancellationToken);
+            // await repository.EmptyDatabase(cancellationToken);
 
-            if (await repository.IsDatabaseEmpty(cancellationToken))
+            if (repository.IsDatabaseEmpty(cancellationToken))
                 await AddDataSet();
         }
 

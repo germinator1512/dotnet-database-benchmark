@@ -8,6 +8,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Entities
 {
     public class MongoFriendShipEntity
     {
+        [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 

@@ -10,6 +10,7 @@ namespace BenchmarkApp.Server.Database.SQL.Interfaces
         Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level);
 
         Task EmptyDatabase(CancellationToken cancellationToken);
-        Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken);
+        
+        bool IsDatabaseEmpty(CancellationToken cancellationToken);
     }
 }
