@@ -15,7 +15,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<MongoFriendShipEntity>> GetAllFriendsAsync(int level)
+        public async Task<IEnumerable<MongoUserEntity>> GetAllFriendsAsync(int level)
         {
             var user = await _ctx.Users
                 .Find(u => u.Name == Config.RootUserName)
@@ -23,34 +23,25 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             await LoadFriendsRecursively(user, level);
 
-            return user.FriendShips;
+            return user.Friends;
         }
 
-        public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
-            => !(await _ctx.Users.Find(_ => true).ToListAsync(cancellationToken)).Any();
-
-        public async Task EmptyDatabase(CancellationToken cancellationToken)
-        {
-            await _ctx.Users.DeleteManyAsync(u => true, cancellationToken);
-            await _ctx.FriendShips.DeleteManyAsync(u => true, cancellationToken);
-        }
-
-        private async Task<MongoUserEntity> LoadFriendsRecursively(
+        private async Task LoadFriendsRecursively(
             MongoUserEntity root,
             int nestedLevels,
             int currentLevel = 1)
         {
-            await root.LoadFriendShips(_ctx);
-            foreach (var friendship in root.FriendShips)
-            {
-                await friendship.LoadFriend(_ctx);
-                if (currentLevel < nestedLevels)
-                {
-                    return await LoadFriendsRecursively(friendship.FriendB, nestedLevels, currentLevel + 1);
-                }
-            }
-
-            return root;
+            await root.LoadFriends(_ctx);
+            
+            if (currentLevel < nestedLevels)
+                foreach (var friend in root.Friends)
+                    await LoadFriendsRecursively(friend, nestedLevels, currentLevel + 1);
         }
+        
+        public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
+            => !(await _ctx.Users.Find(_ => true).ToListAsync(cancellationToken)).Any();
+
+        public async Task EmptyDatabase(CancellationToken cancellationToken)
+            => await _ctx.Users.DeleteManyAsync(u => true, cancellationToken);
     }
 }

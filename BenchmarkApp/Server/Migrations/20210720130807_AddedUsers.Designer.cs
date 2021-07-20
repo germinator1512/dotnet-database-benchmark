@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BenchmarkApp.Server.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    [Migration("20210720092752_AddedEntities")]
-    partial class AddedEntities
+    [Migration("20210720130807_AddedUsers")]
+    partial class AddedUsers
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -11,7 +11,6 @@ namespace BenchmarkApp.Server.Database.SQL.Entities
 
         public string Name { get; set; }
 
-        [InverseProperty("FriendA")]
-        public List<SqlFriendshipEntity> FriendShips { get; set; } = new();
+        [InverseProperty("FriendA")] public List<SqlFriendshipEntity> FriendShips { get; set; } = new();
     }
 }

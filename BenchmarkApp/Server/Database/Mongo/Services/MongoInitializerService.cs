@@ -8,6 +8,7 @@ using BenchmarkApp.Server.Database.Mongo.Entities;
 using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Services
@@ -25,7 +26,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             _context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
             var repository = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
 
-            await repository.EmptyDatabase(cancellationToken);
+            // await repository.EmptyDatabase(cancellationToken);
 
             if (await repository.IsDatabaseEmpty(cancellationToken))
                 await AddDataSet();
@@ -41,8 +42,8 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 Name = Config.RootUserName,
             };
 
-            await _context.Users.InsertOneAsync(firstUser);
             await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
+            await _context.Users.InsertOneAsync(firstUser);
         }
 
         /// <summary>
@@ -64,23 +65,14 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 .ToList();
 
             var friends = GenerateFriends();
-            await _context.Users.InsertManyAsync(friends);
-
-            List<MongoFriendShipEntity> GenerateFriendShips()
-                => friends.Select(f => new MongoFriendShipEntity
-                    {
-                        FriendARef = new MongoDBRef("users", root.Id),
-                        FriendBRef = new MongoDBRef("users", f.Id),
-                    })
-                    .ToList();
-
-            var friendships = GenerateFriendShips();
-
-            await _context.FriendShips.InsertManyAsync(friendships);
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in friends)
                     await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
+
+            await _context.Users.InsertManyAsync(friends);
+
+            friends.ForEach(f => root.FriendIds.Add(new MongoDBRef("users", f.Id)));
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

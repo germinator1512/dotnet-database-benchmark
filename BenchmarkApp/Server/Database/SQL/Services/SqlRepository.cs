@@ -31,7 +31,13 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var query =
                 _ctx.Friendships
                     .Where(f => f.FriendA.Id == firstUser.Id)
-                    .Include(f => f.FriendB);
+                    .Include(f => f.FriendB)
+                    .ThenInclude(user => user.FriendShips)
+                    .ThenInclude(f => f.FriendB)
+                    .ThenInclude(user => user.FriendShips)
+                    .ThenInclude(f => f.FriendB)
+                    .ThenInclude(user => user.FriendShips)
+                    .ThenInclude(f => f.FriendB);
 
             foreach (var _ in Enumerable.Range(0, level))
             {

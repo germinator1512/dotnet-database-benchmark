@@ -18,7 +18,5 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         }
 
         public IMongoCollection<MongoUserEntity> Users => _database.GetCollection<MongoUserEntity>("users");
-
-        public IMongoCollection<MongoFriendShipEntity> FriendShips => _database.GetCollection<MongoFriendShipEntity>("friendShips");
     }
 }
