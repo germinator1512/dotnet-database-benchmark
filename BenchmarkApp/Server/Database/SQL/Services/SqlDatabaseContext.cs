@@ -18,19 +18,23 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         {
             modelBuilder.Entity<SqlUserEntity>()
                 .HasKey(f => f.Id);
-            
 
             modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasKey(f => new {f.FriendAId, f.FriendBId});
 
-     
-            modelBuilder.Entity<SqlUserEntity>()
-                .HasMany(g => g.FriendShips)
-                .WithOne(s => s.FriendA)
-                .HasForeignKey(s => s.FriendAId);
+            modelBuilder.Entity<SqlFriendshipEntity>()
+                .HasOne(f => f.FriendA);
+
+
+            modelBuilder.Entity<SqlFriendshipEntity>()
+                .HasOne(r => r.FriendB)
+                .WithMany()
+                .HasForeignKey(r => r.FriendBId);
             
             modelBuilder.Entity<SqlFriendshipEntity>()
-                .HasOne(g => g.FriendB);
+                .HasOne(r => r.FriendA)
+                .WithMany(p => p.FriendShips)
+                .HasForeignKey(r => r.FriendAId);
         }
     }
 }

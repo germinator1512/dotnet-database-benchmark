@@ -59,26 +59,21 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         /// <param name="howMany">number of new entities to be added to friends list of root user</param>
         /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
         /// <param name="currentLevel">current level of function call</param>
-        private async Task AddFriendRecursively(
+        private static async Task AddFriendRecursively(
             SqlUserEntity root,
             int howMany,
             int nestedLevels,
             int currentLevel = 1)
         {
-            // var friends = GenerateFriends(howMany, currentLevel);
-            // await _context.Users.AddRangeAsync(friends);
-            // await _context.SaveChangesAsync();
-
-            var friendShips = GenerateFriendsWithFriendShips(root, howMany, currentLevel);
-            await _context.Friendships.AddRangeAsync(friendShips);
+            root.FriendShips = GenerateFriendsWithFriendShips(root, howMany, currentLevel);
 
             if (currentLevel < nestedLevels)
-                foreach (var friend in friendShips.Select(f => f.FriendB))
+                foreach (var friend in root.FriendShips.Select(f => f.FriendB))
                     await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
-        
 
-        private static IEnumerable<SqlFriendshipEntity> GenerateFriendsWithFriendShips(
+
+        private static List<SqlFriendshipEntity> GenerateFriendsWithFriendShips(
             SqlUserEntity rootFriend,
             int howMany,
             int level)
@@ -92,8 +87,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                     FriendB = new SqlUserEntity
                     {
                         Name = Config.UserName(level, z),
-                    }
-                });
+                    },
+                }).ToList();
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

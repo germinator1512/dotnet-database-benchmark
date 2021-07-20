@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BenchmarkApp.Server.Migrations
 {
     [DbContext(typeof(SqlDatabaseContext))]
-    [Migration("20210704100722_AddedUsers")]
-    partial class AddedUsers
+    [Migration("20210720092752_AddedEntities")]
+    partial class AddedEntities
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,30 +23,24 @@ namespace BenchmarkApp.Server.Migrations
 
             modelBuilder.Entity("BenchmarkApp.Server.Database.SQL.Entities.SqlFriendshipEntity", b =>
                 {
-                    b.Property<int>("FriendAId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("FriendAId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("FriendBId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("SqlUserEntityId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("FriendBId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("FriendAId", "FriendBId");
 
                     b.HasIndex("FriendBId");
-
-                    b.HasIndex("SqlUserEntityId");
 
                     b.ToTable("Friendships");
                 });
 
             modelBuilder.Entity("BenchmarkApp.Server.Database.SQL.Entities.SqlUserEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -59,7 +53,7 @@ namespace BenchmarkApp.Server.Migrations
             modelBuilder.Entity("BenchmarkApp.Server.Database.SQL.Entities.SqlFriendshipEntity", b =>
                 {
                     b.HasOne("BenchmarkApp.Server.Database.SQL.Entities.SqlUserEntity", "FriendA")
-                        .WithMany()
+                        .WithMany("FriendShips")
                         .HasForeignKey("FriendAId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -69,10 +63,6 @@ namespace BenchmarkApp.Server.Migrations
                         .HasForeignKey("FriendBId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("BenchmarkApp.Server.Database.SQL.Entities.SqlUserEntity", null)
-                        .WithMany("FriendShips")
-                        .HasForeignKey("SqlUserEntityId");
 
                     b.Navigation("FriendA");
 
