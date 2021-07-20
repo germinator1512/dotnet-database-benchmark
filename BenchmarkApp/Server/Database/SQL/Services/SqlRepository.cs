@@ -28,25 +28,28 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         {
             var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals(Config.RootUserName));
 
-            var query =
-                _ctx.Friendships
-                    .Where(f => f.FriendA.Id == firstUser.Id)
-                    .Include(f => f.FriendB)
+            return await _ctx.Friendships
+                .Where(f => f.FriendA.Id == firstUser.Id)
+                .Include(f => f.FriendB)
+                .If(level > 0, level1 => level1
                     .ThenInclude(user => user.FriendShips)
                     .ThenInclude(f => f.FriendB)
-                    .ThenInclude(user => user.FriendShips)
-                    .ThenInclude(f => f.FriendB)
-                    .ThenInclude(user => user.FriendShips)
-                    .ThenInclude(f => f.FriendB);
-
-            foreach (var _ in Enumerable.Range(0, level))
-            {
-                query
-                    .ThenInclude(user => user.FriendShips)
-                    .ThenInclude(f => f.FriendB);
-            }
-
-            return await query.ToListAsync();
+                    .If(level > 1, level2 => level2
+                        .ThenInclude(user => user.FriendShips)
+                        .ThenInclude(f => f.FriendB)
+                        .If(level > 2, level3 => level3
+                            .ThenInclude(user => user.FriendShips)
+                            .ThenInclude(f => f.FriendB)
+                            .If(level > 3, level4 => level4
+                                .ThenInclude(user => user.FriendShips)
+                                .ThenInclude(f => f.FriendB)
+                                .If(level > 4, level5 => level5
+                                    .ThenInclude(user => user.FriendShips)
+                                    .ThenInclude(f => f.FriendB)
+                                    .If(level > 5, level6 => level6
+                                        .ThenInclude(user => user.FriendShips)
+                                        .ThenInclude(f => f.FriendB)))))))
+                .ToListAsync();
         }
     }
 }

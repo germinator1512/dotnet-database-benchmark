@@ -27,7 +27,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             var client = scope.ServiceProvider.GetRequiredService<IGraphClient>();
             await client.ConnectAsync();
 
-            // await _repository.EmptyDatabase();
+            await _repository.EmptyDatabase();
 
             var isEmpty = await _repository.IsDatabaseEmpty();
             if (isEmpty) await AddDataSet();
