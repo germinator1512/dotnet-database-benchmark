@@ -6,7 +6,6 @@ using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using Neo4jClient;
-using Neo4jClient.Cypher;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
@@ -18,35 +17,33 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
         {
-            
-            // Match (user:User{name:"Max Mustermann"})-[:KNOWS]->(friend:User)
-            // -[:KNOWS]->(friend0:User)-[:KNOWS]->(friend1:User)
-            // -[:KNOWS]->(friend2:User) return friend, friend0, friend1, friend2
-            
-            
-            var queryString = @"(user:User{name: $name})-[:KNOWS]->(friend:User)";
-            var resultString = "friend";
+            var queryString = @"(user:User{name:$name})
+                -[:KNOWS]->(friend:User) 
+                -[:KNOWS]->(friend0:User)
+                -[:KNOWS]->(friend1:User)
+                -[:KNOWS]->(friend2:User)
+                -[:KNOWS]->(friend3:User)";
 
-            foreach (var i in Enumerable.Range(0, level))
-            {
-                queryString += ($"-[:KNOWS]->(friend{i}:User)");
-                resultString += ($"friend{i}");
-            }
+
+            // foreach (var i in Enumerable.Range(0, level))
+            // {
+            //     queryString += ($"-[:KNOWS]->(friend{i}:User) ");
+            // }
 
             var result = await _client.Cypher
                 .Match(queryString)
                 .WithParam("name", Config.RootUserName)
-                .Return(() => new
-                {
-                    Friends = Return.As<Neo4JUserEntity>("friend"),
-                    Friends0 = Return.As<Neo4JUserEntity>("friend0"),
-                    Friends1 = Return.As<Neo4JUserEntity>("friend1"),
-                    Friends2 = Return.As<Neo4JUserEntity>("friend2"),
-                })
+                .With("user, friend, friend0, friend1, friend2, {name:friend3.name, id:friend3.id} as friends3")
+                .With("user,friend, friend0, friend1, {name:friend2.name, id:friend2.id, friends: collect(friends3)} as friends2")
+                .With("user,friend, friend0, {name:friend1.name, id:friend1.id, friends: collect(friends2)} as friends1")
+                .With("user, friend, {name:friend0.name, id:friend0.id, friends: collect(friends1)} as friends0")
+                .With("user, {name:friend.name, id:friend.id, friends: collect(friends0)} as friends")
+                .With("{name:user.name, id:user.id, friends: collect(friends)} as rootUser")
+                .Return<Neo4JUserEntity>("rootUser")
                 .ResultsAsync;
 
 
-            return new List<Neo4JUserEntity>();
+            return result;
         }
 
         public async Task<bool> IsDatabaseEmpty()
