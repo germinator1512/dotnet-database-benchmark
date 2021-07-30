@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace BenchmarkApp.Server.Database.SQL
 {
-    public static class QueryableExtensions
+    public static class SqlQueryableExtensions
     {
         public static IQueryable<T> If<T, P>(
             this IIncludableQueryable<T, P> source,

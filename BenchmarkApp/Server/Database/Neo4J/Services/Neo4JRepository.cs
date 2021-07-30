@@ -12,38 +12,37 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     public class Neo4JRepository : INeo4JRepository
     {
         private readonly IGraphClient _client;
-
         public Neo4JRepository(IGraphClient client) => _client = client;
 
         public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
         {
-            var queryString = @"(user:User{name:$name})
-                -[:KNOWS]->(friend:User) 
-                -[:KNOWS]->(friend0:User)
-                -[:KNOWS]->(friend1:User)
-                -[:KNOWS]->(friend2:User)
-                -[:KNOWS]->(friend3:User)";
+            var queryString = @"(user:User{name:$name})-[:KNOWS]->(friend:User)";
 
-
-            // foreach (var i in Enumerable.Range(0, level))
-            // {
-            //     queryString += ($"-[:KNOWS]->(friend{i}:User) ");
-            // }
+            foreach (var i in Enumerable.Range(0, level))
+            {
+                queryString += ($"-[:KNOWS]->(friend{i}:User)");
+            }
 
             var result = await _client.Cypher
                 .Match(queryString)
                 .WithParam("name", Config.RootUserName)
-                .With("user, friend, friend0, friend1, friend2, {name:friend3.name, id:friend3.id} as friends3")
-                .With("user,friend, friend0, friend1, {name:friend2.name, id:friend2.id, friends: collect(friends3)} as friends2")
-                .With("user,friend, friend0, {name:friend1.name, id:friend1.id, friends: collect(friends2)} as friends1")
-                .With("user, friend, {name:friend0.name, id:friend0.id, friends: collect(friends1)} as friends0")
-                .With("user, {name:friend.name, id:friend.id, friends: collect(friends0)} as friends")
-                .With("{name:user.name, id:user.id, friends: collect(friends)} as rootUser")
+                .If(level > 5, c4 => c4.With(QueryStrings.Friends4)
+                    .If(level > 4, c3 => c3.With(QueryStrings.Friends3)
+                        .If(level > 3, c2 => c2.With(QueryStrings.Friends2)
+                            .If(level > 2, c1 => c1.With(QueryStrings.Friends1)
+                                .If(level > 1, c0 => c0.With(QueryStrings.Friends0)
+                                )
+                            )
+                        )
+                    )
+                )
+                .With(QueryStrings.Friends)
+                .With(QueryStrings.RootUser)
                 .Return<Neo4JUserEntity>("rootUser")
                 .ResultsAsync;
 
 
-            return result;
+            return result.Single().Friends;
         }
 
         public async Task<bool> IsDatabaseEmpty()
