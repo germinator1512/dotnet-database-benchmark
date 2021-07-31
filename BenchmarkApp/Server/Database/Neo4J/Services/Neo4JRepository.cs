@@ -16,34 +16,49 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
         {
-            var queryString = @"(user:User{name:$name})-[:KNOWS]->(friend:User)";
-
-            foreach (var i in Enumerable.Range(0, level))
-            {
-                queryString += ($"-[:KNOWS]->(friend{i}:User)");
-            }
-
             var result = await _client.Cypher
-                .Match(queryString)
+                .Match(GenerateQueryString(level))
                 .WithParam("name", Config.RootUserName)
-                .If(level > 5, c4 => c4.With(QueryStrings.Friends4)
-                    .If(level > 4, c3 => c3.With(QueryStrings.Friends3)
-                        .If(level > 3, c2 => c2.With(QueryStrings.Friends2)
-                            .If(level > 2, c1 => c1.With(QueryStrings.Friends1)
-                                .If(level > 1, c0 => c0.With(QueryStrings.Friends0)
-                                )
-                            )
-                        )
-                    )
-                )
-                .With(QueryStrings.Friends)
-                .With(QueryStrings.RootUser)
                 .Return<Neo4JUserEntity>("rootUser")
                 .ResultsAsync;
 
-
             return result.Single().Friends;
         }
+
+
+        private static string GenerateQueryString(int level)
+        {
+            var queryString = @"(user:User{name:$name})-[:KNOWS]->(friend1:User) ";
+
+            foreach (var i in Enumerable.Range(1, level))
+            {
+                queryString += ($"-[:KNOWS]->(friend{i + 1}:User) ");
+            }
+
+            foreach (var depth in Enumerable.Range(0, level + 1).Reverse())
+            {
+                var withQuery = "with user,";
+
+                foreach (var userIndex in Enumerable.Range(1, depth))
+                {
+                    withQuery += ($"friend{userIndex}, ");
+                }
+
+                withQuery += $"{{name: friend{depth + 1}.name, id: friend{depth + 1}.id ";
+
+                if (depth != level)
+                {
+                    withQuery += $", friends: collect(friends{depth + 2})";
+                }
+
+                withQuery += $"}} as friends{depth + 1} ";
+
+                queryString += withQuery;
+            }
+
+            return queryString + "with {name:user.name, id:user.id, friends: collect(friends1)} as rootUser";
+        }
+
 
         public async Task<bool> IsDatabaseEmpty()
             => (await _client.Cypher
