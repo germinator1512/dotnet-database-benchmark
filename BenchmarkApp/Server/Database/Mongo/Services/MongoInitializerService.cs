@@ -8,7 +8,6 @@ using BenchmarkApp.Server.Database.Mongo.Entities;
 using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Services

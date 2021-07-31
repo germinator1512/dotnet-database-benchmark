@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.SQL.Interfaces;
 using BenchmarkApp.Server.Services.Interfaces;
 using BenchmarkApp.Shared;
+using BenchmarkApp.Server.Database.Core;
 
 namespace BenchmarkApp.Server.Services
 {
@@ -13,10 +16,17 @@ namespace BenchmarkApp.Server.Services
 
         public async Task<BenchmarkResult> StartBenchmark()
         {
-            var entities = await _sqlRepository.GetAllFriendsAsync( 5);
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var entities = await _sqlRepository.GetAllFriendsAsync(Config.Level);
+
+            timer.Stop();
             return new BenchmarkResult
             {
-                Success = true
+                Level = Config.Level,
+                Success = true,
+                TimeSpan = timer.Elapsed
             };
         }
     }
