@@ -23,10 +23,16 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                 .HasKey(f => new {f.FriendAId, f.FriendBId});
 
             modelBuilder.Entity<SqlFriendshipEntity>()
+                .HasIndex(f => f.FriendAId);
+
+            modelBuilder.Entity<SqlFriendshipEntity>()
+                .HasIndex(f => f.FriendBId);
+
+            modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasOne(r => r.FriendB)
                 .WithMany()
                 .HasForeignKey(r => r.FriendBId);
-            
+
             modelBuilder.Entity<SqlFriendshipEntity>()
                 .HasOne(r => r.FriendA)
                 .WithMany(p => p.FriendShips)

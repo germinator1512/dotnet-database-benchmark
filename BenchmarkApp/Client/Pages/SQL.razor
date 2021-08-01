@@ -2,23 +2,52 @@
 @using BenchmarkApp.Shared
 @inject HttpClient Http
 
-<button class="btn btn-primary" @onclick="StartBenchmark">Start SQL Benchmark</button>
 
-@if (_result != null)
+<button class="btn btn-primary" @onclick="StartBenchmark">Start Overall SQL Benchmark</button>
+@if (_isLoading)
 {
-    <h1>@_result.Success</h1>
-    <h1>@_result.Level</h1>
-    <h1>@_result.TimeSpan</h1>
+    <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+}
+
+<div style="height: 15px"> </div>
+
+
+@if (_results != null)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Level</th>
+            <th>LoadedEntities</th>
+            <th>TimeSpan</th>
+            <th>Success</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var result in _results)
+        {
+            <tr>
+                <td>@result.Level</td>
+                <td>@result.LoadedEntities</td>
+                <td>@result.TimeSpan</td>
+                <td>@result.Success</td>
+            </tr>
+        }
+        </tbody>
+    </table>
 }
 
 
 @code {
 
-    private BenchmarkResult _result;
+    private IEnumerable<BenchmarkResult> _results;
+    private bool _isLoading;
 
     private async Task StartBenchmark()
     {
-        _result = await Http.GetFromJsonAsync<BenchmarkResult>("benchmark/sql");
+        _isLoading = true;
+        _results = await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>("benchmark/sql");
+        _isLoading = false;
     }
 
 }

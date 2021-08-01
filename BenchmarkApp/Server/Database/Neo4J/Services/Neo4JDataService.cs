@@ -1,38 +1,34 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Neo4jClient;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
-    public class Neo4JInitializerService : IHostedService
+    public class Neo4JDataService
     {
-        private readonly IServiceProvider _serviceProvider;
-        private INeo4JRepository _repository;
+        private readonly INeo4JRepository _repository;
+        private readonly IGraphClient _client;
 
-        public Neo4JInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Neo4JDataService(INeo4JRepository neo4JRepository, IGraphClient client)
         {
-            var scope = _serviceProvider.CreateScope();
-            _repository = scope.ServiceProvider.GetRequiredService<INeo4JRepository>();
+            _repository = neo4JRepository;
+            _client = client;
+        }
 
-            var client = scope.ServiceProvider.GetRequiredService<IGraphClient>();
-            await client.ConnectAsync();
-
+        public async Task InitializeDb()
+        {
+            await _client.ConnectAsync();
             await _repository.EmptyDatabase();
 
             var isEmpty = await _repository.IsDatabaseEmpty();
             if (isEmpty) await AddDataSet();
         }
-
 
         private async Task AddDataSet()
         {
@@ -81,8 +77,5 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                     Name = Config.UserName(level, z),
                     Id = Guid.NewGuid().ToString()
                 }).ToList();
-
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

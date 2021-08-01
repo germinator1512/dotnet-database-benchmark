@@ -31,7 +31,7 @@ namespace BenchmarkApp.Server
         {
             var config = new Neo4JConfig();
             _configuration.GetSection("Neo4JConfig").Bind(config);
-            
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -39,16 +39,16 @@ namespace BenchmarkApp.Server
             services.AddDbContext<SqlDatabaseContext>((_, options) =>
             {
                 var connectionString = _configuration.GetConnectionString("Postgres");
-                options.UseNpgsql(connectionString)
-                    .LogTo(Console.WriteLine)
-                    .EnableSensitiveDataLogging();
+                options.UseNpgsql(connectionString);
+                // .LogTo(Console.WriteLine)
+                // .EnableSensitiveDataLogging();
             });
-            
+
             var neo4JClient = new GraphClient(new Uri(config.ClientUrl), config.User, config.Password)
             {
                 JsonContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            
+
             services.AddSingleton<IGraphClient>(neo4JClient);
             services.AddTransient<MongoDatabaseContext>();
 
@@ -64,7 +64,12 @@ namespace BenchmarkApp.Server
             // database initialization
             services.AddHostedService<PostgresInitializerService>();
             services.AddHostedService<MongoInitializerService>();
-            services.AddHostedService<Neo4JInitializerService>();
+
+            services.AddTransient<Neo4JDataService>();
+
+            // services.AddHostedService<Neo4JInitializerService>();
+
+            // services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromHours(2));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

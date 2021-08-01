@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkApp.Server.Services.Interfaces;
 using BenchmarkApp.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -28,21 +29,21 @@ namespace BenchmarkApp.Server.Controllers
         }
 
         [HttpGet("mongo")]
-        public async Task<BenchmarkResult> Mongo()
+        public async Task<IEnumerable<BenchmarkResult>> Mongo()
         {
             _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
             return await _mongoBenchmarkService.StartBenchmark();
         }
 
         [HttpGet("sql")]
-        public async Task<BenchmarkResult> Sql()
+        public async Task<IEnumerable<BenchmarkResult>> Sql()
         {
             _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
             return await _sqlBenchmarkService.StartBenchmark();
         }
 
         [HttpGet("neo4j")]
-        public async Task<BenchmarkResult> Neo4J()
+        public async Task<IEnumerable<BenchmarkResult>> Neo4J()
         {
             _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
             return await _neo4JBenchmarkService.StartBenchmark();

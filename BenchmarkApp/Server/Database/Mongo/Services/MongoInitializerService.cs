@@ -19,6 +19,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
         public MongoInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
+        
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
