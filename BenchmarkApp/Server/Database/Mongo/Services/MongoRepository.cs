@@ -29,7 +29,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         private async Task LoadFriendsRecursively(
             MongoUserEntity root,
             int nestedLevels,
-            int currentLevel = 1)
+            int currentLevel = 0)
         {
             await root.LoadFriends(_ctx);
             

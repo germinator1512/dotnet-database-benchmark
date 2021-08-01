@@ -46,9 +46,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                                 .If(level > 4, level5 => level5
                                     .ThenInclude(user => user.FriendShips)
                                     .ThenInclude(f => f.FriendB)
-                                    .If(level > 5, level6 => level6
-                                        .ThenInclude(user => user.FriendShips)
-                                        .ThenInclude(f => f.FriendB)))))))
+                                )))))
                 .ToListAsync();
         }
     }

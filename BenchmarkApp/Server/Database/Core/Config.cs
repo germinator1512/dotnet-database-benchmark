@@ -6,7 +6,7 @@
         public const string RootUserName = "Max Mustermann";
         public const int NestedUserLevels = 6;
         public const int FriendsPerUser = 3;
-        
-        public const int Level = 5;
+
+        public const int Level = 0;
     }
 }
