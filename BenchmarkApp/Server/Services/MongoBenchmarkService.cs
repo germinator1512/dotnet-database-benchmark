@@ -40,7 +40,7 @@ namespace BenchmarkApp.Server.Services
                 {
                     Level = level,
                     Success = true,
-                    TimeSpan = timer.Elapsed,
+                    MilliSeconds = timer.ElapsedMilliseconds,
                     LoadedEntities = Math.Pow(Config.FriendsPerUser, level + 1)
                 };
             }
@@ -51,7 +51,7 @@ namespace BenchmarkApp.Server.Services
                 {
                     Level = level,
                     Success = false,
-                    TimeSpan = timer.Elapsed,
+                    MilliSeconds = timer.ElapsedMilliseconds,
                     LoadedEntities = Math.Pow(Config.FriendsPerUser, level + 1)
                 };
             }

@@ -67,7 +67,7 @@ namespace BenchmarkApp.Server
 
             services.AddTransient<Neo4JDataService>();
 
-            // services.AddHostedService<Neo4JInitializerService>();
+            services.AddHostedService<Neo4JInitializerService>();
 
             // services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromHours(2));
         }

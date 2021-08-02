@@ -15,6 +15,6 @@ services:
 
     #      database explorer under http://localhost:7474/browser/
 
-    mem_limit: 2048m
-    mem_reservation: 2048M
+    mem_limit: 8000m
+    mem_reservation: 8000m
     cpus: 2

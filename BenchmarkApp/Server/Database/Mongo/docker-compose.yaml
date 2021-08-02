@@ -15,6 +15,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
       
-    mem_limit: 2048m
-    mem_reservation: 2048M
+    mem_limit: 8000m
+    mem_reservation: 8000m
     cpus: 2

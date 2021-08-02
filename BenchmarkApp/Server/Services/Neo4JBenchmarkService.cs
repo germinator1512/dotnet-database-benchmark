@@ -24,7 +24,7 @@ namespace BenchmarkApp.Server.Services
 
         public async Task<IEnumerable<BenchmarkResult>> StartBenchmark()
         {
-            await _dataService.InitializeDb();
+            // await _dataService.InitializeDb();
 
             var results = new List<BenchmarkResult>();
             foreach (var i in Enumerable.Range(0, 6))
@@ -42,13 +42,13 @@ namespace BenchmarkApp.Server.Services
 
             try
             {
-                var entities = await _neo4JRepository.GetAllFriendsAsync(Config.Level);
+                var entities = await _neo4JRepository.GetAllFriendsAsync(level);
                 timer.Stop();
                 return new BenchmarkResult
                 {
                     Level = level,
                     Success = true,
-                    TimeSpan = timer.Elapsed,
+                    MilliSeconds = timer.ElapsedMilliseconds,
                     LoadedEntities = Math.Pow(Config.FriendsPerUser, level + 1)
                 };
             }
@@ -59,7 +59,7 @@ namespace BenchmarkApp.Server.Services
                 {
                     Level = level,
                     Success = false,
-                    TimeSpan = timer.Elapsed,
+                    MilliSeconds = timer.ElapsedMilliseconds,
                     LoadedEntities = Math.Pow(Config.FriendsPerUser, level + 1)
                 };
             }

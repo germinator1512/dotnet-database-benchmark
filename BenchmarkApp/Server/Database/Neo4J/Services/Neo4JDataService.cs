@@ -24,7 +24,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         public async Task InitializeDb()
         {
             await _client.ConnectAsync();
-            await _repository.EmptyDatabase();
+            // await _repository.EmptyDatabase();
 
             var isEmpty = await _repository.IsDatabaseEmpty();
             if (isEmpty) await AddDataSet();
