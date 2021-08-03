@@ -5,10 +5,20 @@
 <h4>Postgres Benchmark</h4>
 
 <div class="margin">
-    <button class="btn btn-primary" @onclick="StartBenchmark">Start Neighbours Benchmark</button>
+    <div class="margin">
+        <button class="btn btn-primary" @onclick="StartNeighbourBenchmark">Start Neighbours Benchmark</button>
+        <span> Finding specific user and loading n level of friends (Every User has 10 friends) </span>
+    </div>
+    <div class="margin">
+        <button class="btn btn-primary" @onclick="StartUserBenchmark">Start User Benchmark</button>
+        <span> Loading n random users from Database</span>
+    </div>
+    
     @if (_isLoading)
     {
-        <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+        <div class="margin">
+            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+        </div>
     }
 
     <div style="height: 15px"> </div>
@@ -31,7 +41,7 @@
                 <tr>
                     <td>@result.Level</td>
                     <td>@result.LoadedEntities</td>
-                    <td>@result.MilliSeconds</td>
+                    <td>@result.MilliSeconds Milliseconds</td>
                     <td>@result.Success</td>
                 </tr>
             }
@@ -45,11 +55,19 @@
     private IEnumerable<BenchmarkResult> _results;
     private bool _isLoading;
 
-    private async Task StartBenchmark()
+    private async Task StartNeighbourBenchmark()
     {
         _isLoading = true;
-        _results = await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>("benchmark/sql");
+        _results = await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>("benchmark/sql/neighbour");
         _isLoading = false;
     }
+
+    private async Task StartUserBenchmark()
+    {
+        _isLoading = true;
+        _results = await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>("benchmark/sql/user");
+        _isLoading = false;
+    }
+
 
 }

@@ -13,10 +13,14 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         private readonly IGraphClient _client;
         public Neo4JRepository(IGraphClient client) => _client = client;
 
-        public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
+        public async Task ConnectAsync()
         {
             await _client.ConnectAsync();
+            await GetAllFriendsAsync(0);
+        }
 
+        public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
+        {
             var result = await _client.Cypher
                 .Match(GenerateQueryString(level))
                 .WithParam("name", Config.RootUserName)
@@ -24,6 +28,17 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .ResultsAsync;
 
             return result.Single().Friends;
+        }
+
+        public async Task<IEnumerable<Neo4JUserEntity>> GetUserAsync(int howMany)
+        {
+            var result = await _client.Cypher
+                .Match("(user:User)")
+                .Return<Neo4JUserEntity>("user")
+                .Limit(howMany)
+                .ResultsAsync;
+
+            return result;
         }
 
 

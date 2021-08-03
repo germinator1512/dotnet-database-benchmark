@@ -28,25 +28,46 @@ namespace BenchmarkApp.Server.Controllers
             _neo4JBenchmarkService = neo4JBenchmarkService;
         }
 
-        [HttpGet("mongo")]
-        public async Task<IEnumerable<BenchmarkResult>> Mongo()
+        [HttpGet("mongo/neighbour")]
+        public async Task<IEnumerable<BenchmarkResult>> MongoNeighbour()
         {
             _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
-            return await _mongoBenchmarkService.StartBenchmark();
+            return await _mongoBenchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
         }
 
-        [HttpGet("sql")]
-        public async Task<IEnumerable<BenchmarkResult>> Sql()
+        [HttpGet("mongo/user")]
+        public async Task<IEnumerable<BenchmarkResult>> MongoUser()
+        {
+            _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
+            return await _mongoBenchmarkService.StartUserBenchmarkAsync();
+        }
+
+        [HttpGet("sql/neighbour")]
+        public async Task<IEnumerable<BenchmarkResult>> SqlNeighbour()
         {
             _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
-            return await _sqlBenchmarkService.StartBenchmark();
+            return await _sqlBenchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
         }
 
-        [HttpGet("neo4j")]
-        public async Task<IEnumerable<BenchmarkResult>> Neo4J()
+        [HttpGet("sql/user")]
+        public async Task<IEnumerable<BenchmarkResult>> SqlUser()
+        {
+            _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
+            return await _sqlBenchmarkService.StartUserBenchmarkAsync();
+        }
+
+        [HttpGet("neo4j/neighbour")]
+        public async Task<IEnumerable<BenchmarkResult>> Neo4JNeighbour()
         {
             _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
-            return await _neo4JBenchmarkService.StartBenchmark();
+            return await _neo4JBenchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
+        }
+
+        [HttpGet("neo4j/user")]
+        public async Task<IEnumerable<BenchmarkResult>> Neo4JUser()
+        {
+            _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
+            return await _neo4JBenchmarkService.StartUserBenchmarkAsync();
         }
     }
 }

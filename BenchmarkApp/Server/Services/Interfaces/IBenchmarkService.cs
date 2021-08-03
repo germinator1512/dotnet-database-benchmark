@@ -6,8 +6,8 @@ namespace BenchmarkApp.Server.Services.Interfaces
 {
     public interface IBenchmarkService
     {
-        Task<IEnumerable<BenchmarkResult>> StartBenchmark();
+        Task<IEnumerable<BenchmarkResult>> StartFriendsWithNeighboursBenchmarkAsync();
 
-        Task<BenchmarkResult> StartBenchmarkWithLevel(int level);
+        Task<IEnumerable<BenchmarkResult>> StartUserBenchmarkAsync();
     }
 }

@@ -15,24 +15,42 @@ namespace BenchmarkApp.Server.Services
         private readonly ISqlRepository _sqlRepository;
         public SqlBenchmarkService(ISqlRepository sqlRepository) => _sqlRepository = sqlRepository;
 
-        public async Task<IEnumerable<BenchmarkResult>> StartBenchmark()
+        public async Task<IEnumerable<BenchmarkResult>> StartFriendsWithNeighboursBenchmarkAsync()
         {
             var results = new List<BenchmarkResult>();
             foreach (var i in Enumerable.Range(0, 6))
             {
-                results.Add(await StartBenchmarkWithLevel(i));
+                var result = await StartNeighbourBenchmarkWithLevel(i);
+                results.Add(result);
             }
 
             return results;
         }
 
-        public async Task<BenchmarkResult> StartBenchmarkWithLevel(int level)
+        public async Task<IEnumerable<BenchmarkResult>> StartUserBenchmarkAsync()
+        {
+            await _sqlRepository.ConnectAsync();
+            
+            var results = new List<BenchmarkResult>();
+            foreach (var i in Enumerable.Range(0, 6))
+            {
+                var result = await StartUserBenchmarkWithLevel(i);
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+
+        private async Task<BenchmarkResult> StartUserBenchmarkWithLevel(int level)
         {
             var timer = new Stopwatch();
+            var numberToLoad = Math.Pow(Config.FriendsPerUser, level + 1);
+
             timer.Start();
             try
             {
-                var entities = await _sqlRepository.GetAllFriendsAsync(level);
+                var entities = await _sqlRepository.GetUserAsync((int) numberToLoad);
 
                 timer.Stop();
                 return new BenchmarkResult
@@ -40,7 +58,7 @@ namespace BenchmarkApp.Server.Services
                     Level = level,
                     Success = true,
                     MilliSeconds = timer.ElapsedMilliseconds,
-                    LoadedEntities = Math.Pow(Config.FriendsPerUser, level + 1)
+                    LoadedEntities = numberToLoad
                 };
             }
             catch (Exception e)
@@ -51,7 +69,39 @@ namespace BenchmarkApp.Server.Services
                     Level = level,
                     Success = false,
                     MilliSeconds = timer.ElapsedMilliseconds,
-                    LoadedEntities = Math.Pow(Config.FriendsPerUser, level + 1)
+                    LoadedEntities = numberToLoad
+                };
+            }
+        }
+
+
+        private async Task<BenchmarkResult> StartNeighbourBenchmarkWithLevel(int level)
+        {
+            var timer = new Stopwatch();
+            timer.Start();
+            var numberToLoad = Math.Pow(Config.FriendsPerUser, level + 1);
+            try
+            {
+                var entities = await _sqlRepository.GetAllFriendsAsync(level);
+
+                timer.Stop();
+                return new BenchmarkResult
+                {
+                    Level = level,
+                    Success = true,
+                    MilliSeconds = timer.ElapsedMilliseconds,
+                    LoadedEntities = numberToLoad
+                };
+            }
+            catch (Exception e)
+            {
+                timer.Stop();
+                return new BenchmarkResult
+                {
+                    Level = level,
+                    Success = false,
+                    MilliSeconds = timer.ElapsedMilliseconds,
+                    LoadedEntities = numberToLoad
                 };
             }
         }

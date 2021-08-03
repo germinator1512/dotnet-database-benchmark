@@ -6,7 +6,10 @@ namespace BenchmarkApp.Server.Database.Neo4J.Interfaces
 {
     public interface INeo4JRepository
     {
+        Task ConnectAsync();
         Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level);
+
+        Task<IEnumerable<Neo4JUserEntity>> GetUserAsync(int howMany);
 
         Task EmptyDatabase();
 

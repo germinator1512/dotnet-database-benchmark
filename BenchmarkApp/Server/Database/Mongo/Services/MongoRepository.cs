@@ -25,6 +25,13 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return user.Friends;
         }
 
+        public async Task<IEnumerable<MongoUserEntity>> GetUserAsync(int howMany)
+        {
+            return await _ctx.Users.Find(_ => true).Limit(howMany).ToListAsync();
+        }
+
+        public async Task ConnectAsync() => await IsDatabaseEmpty();
+
         private async Task LoadFriendsRecursively(
             MongoUserEntity root,
             int nestedLevels,

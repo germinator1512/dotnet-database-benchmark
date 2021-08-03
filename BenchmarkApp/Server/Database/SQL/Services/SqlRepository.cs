@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
@@ -13,6 +14,18 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         private readonly SqlDatabaseContext _ctx;
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
+
+        public Task<List<SqlUserEntity>> GetUserAsync(int howMany)
+        {
+            var users = _ctx.Users.Take(howMany);
+            return users.ToListAsync();
+        }
+
+        // user to avoid "cold start" of database in first benchmark run
+        public async Task ConnectAsync()
+        {
+            await GetUserAsync((int) Math.Pow(5, 5));
+        }
 
         public async Task EmptyDatabase()
         {

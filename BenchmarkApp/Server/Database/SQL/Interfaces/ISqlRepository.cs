@@ -8,6 +8,10 @@ namespace BenchmarkApp.Server.Database.SQL.Interfaces
     {
         Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level);
 
+        Task<List<SqlUserEntity>> GetUserAsync(int howMany);
+        
+        Task ConnectAsync();
+
         Task EmptyDatabase();
 
         bool IsDatabaseEmpty();
