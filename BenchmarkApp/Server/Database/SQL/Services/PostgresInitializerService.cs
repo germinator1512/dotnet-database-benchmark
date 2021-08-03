@@ -6,32 +6,48 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
 using BenchmarkApp.Server.Database.SQL.Interfaces;
+using BenchmarkApp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace BenchmarkApp.Server.Database.SQL.Services
 {
-    public class PostgresInitializerService : IHostedService
+    public class PostgresInitializerService
     {
-        private readonly IServiceProvider _serviceProvider;
-        private SqlDatabaseContext _context;
+        private readonly SqlDatabaseContext _context;
+        private readonly ISqlRepository _repository;
 
-        public PostgresInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public PostgresInitializerService(SqlDatabaseContext context, ISqlRepository repository)
         {
-            var scope = _serviceProvider.CreateScope();
-            _context = scope.ServiceProvider.GetRequiredService<SqlDatabaseContext>();
-            await _context.Database.MigrateAsync(cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            _context = context;
+            _repository = repository;
+        }
 
-            var repository = scope.ServiceProvider.GetRequiredService<ISqlRepository>();
+        public async Task<InsertResult> InsertUserDataSet()
+        {
+            try
+            {
+                // await _context.Database.MigrateAsync();
+                // await _context.SaveChangesAsync();
+                //
+                // await _repository.EmptyDatabase();
+                //
+                // if (_repository.IsDatabaseEmpty())
+                //     await AddDataSet();
 
-            // await repository.EmptyDatabase(cancellationToken);
-
-            if (repository.IsDatabaseEmpty(cancellationToken))
-                await AddDataSet();
+                return new InsertResult
+                {
+                    Success = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new InsertResult
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
         }
 
 
@@ -90,7 +106,5 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                     },
                 }).ToList();
         }
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

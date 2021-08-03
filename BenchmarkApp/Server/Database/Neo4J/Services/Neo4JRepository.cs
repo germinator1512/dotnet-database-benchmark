@@ -15,6 +15,8 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
         {
+            await _client.ConnectAsync();
+
             var result = await _client.Cypher
                 .Match(GenerateQueryString(level))
                 .WithParam("name", Config.RootUserName)

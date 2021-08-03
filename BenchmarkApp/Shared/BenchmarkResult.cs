@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkApp.Shared
+﻿namespace BenchmarkApp.Shared
 {
     public class BenchmarkResult
     {

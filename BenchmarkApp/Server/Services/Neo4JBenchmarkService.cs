@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
-using BenchmarkApp.Server.Database.Neo4J.Services;
 using BenchmarkApp.Server.Services.Interfaces;
 using BenchmarkApp.Shared;
 
@@ -14,18 +13,11 @@ namespace BenchmarkApp.Server.Services
     public class Neo4JBenchmarkService : INeo4JBenchmarkService
     {
         private readonly INeo4JRepository _neo4JRepository;
-        private readonly Neo4JDataService _dataService;
+        public Neo4JBenchmarkService(INeo4JRepository neo4JRepository) => _neo4JRepository = neo4JRepository;
 
-        public Neo4JBenchmarkService(INeo4JRepository neo4JRepository, Neo4JDataService dataService)
-        {
-            _neo4JRepository = neo4JRepository;
-            _dataService = dataService;
-        }
 
         public async Task<IEnumerable<BenchmarkResult>> StartBenchmark()
         {
-            // await _dataService.InitializeDb();
-
             var results = new List<BenchmarkResult>();
             foreach (var i in Enumerable.Range(0, 6))
             {

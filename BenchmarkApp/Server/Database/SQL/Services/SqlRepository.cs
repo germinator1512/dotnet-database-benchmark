@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
@@ -15,14 +14,14 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public async Task EmptyDatabase(CancellationToken cancellationToken)
+        public async Task EmptyDatabase()
         {
             _ctx.Friendships.RemoveRange(_ctx.Friendships);
             _ctx.Users.RemoveRange(_ctx.Users);
-            await _ctx.SaveChangesAsync(cancellationToken);
+            await _ctx.SaveChangesAsync();
         }
 
-        public bool IsDatabaseEmpty(CancellationToken cancellationToken) => !_ctx.Users.Any();
+        public bool IsDatabaseEmpty() => !_ctx.Users.Any();
 
         public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
         {

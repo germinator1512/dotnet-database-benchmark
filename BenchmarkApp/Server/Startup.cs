@@ -62,12 +62,10 @@ namespace BenchmarkApp.Server
 
 
             // database initialization
-            services.AddHostedService<PostgresInitializerService>();
-            services.AddHostedService<MongoInitializerService>();
+            services.AddTransient<PostgresInitializerService>();
+            services.AddTransient<MongoInitializerService>();
+            services.AddTransient<Neo4JInitializerService>();
 
-            services.AddTransient<Neo4JDataService>();
-
-            services.AddHostedService<Neo4JInitializerService>();
 
             // services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromHours(2));
         }

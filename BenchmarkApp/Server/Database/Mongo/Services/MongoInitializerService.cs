@@ -1,35 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
 using BenchmarkApp.Server.Database.Mongo.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using BenchmarkApp.Shared;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Services
 {
-    public class MongoInitializerService : IHostedService
+    public class MongoInitializerService
     {
-        private readonly IServiceProvider _serviceProvider;
-        private MongoDatabaseContext _context;
+        private readonly IMongoRepository _repository;
+        private readonly MongoDatabaseContext _context;
 
-        public MongoInitializerService(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-        
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public MongoInitializerService(IMongoRepository repository, MongoDatabaseContext context)
         {
-            var scope = _serviceProvider.CreateScope();
-            _context = scope.ServiceProvider.GetRequiredService<MongoDatabaseContext>();
-            var repository = scope.ServiceProvider.GetRequiredService<IMongoRepository>();
+            _repository = repository;
+            _context = context;
+        }
 
-            // await repository.EmptyDatabase(cancellationToken);
+        public async Task<InsertResult> InsertUserDataSet()
+        {
+            try
+            {
+                // await repository.EmptyDatabase(cancellationToken);
 
-            if (await repository.IsDatabaseEmpty(cancellationToken))
-                await AddDataSet();
+                // if (await _repository.IsDatabaseEmpty())
+                //     await AddDataSet();
+
+                return new InsertResult
+                {
+                    Success = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new InsertResult
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
         }
 
 
@@ -74,7 +87,5 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             friends.ForEach(f => root.FriendIds.Add(new MongoDBRef("users", f.Id)));
         }
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

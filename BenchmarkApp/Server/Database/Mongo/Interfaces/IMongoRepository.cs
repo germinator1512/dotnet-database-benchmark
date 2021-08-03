@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Mongo.Entities;
 
@@ -9,8 +8,8 @@ namespace BenchmarkApp.Server.Database.Mongo.Interfaces
     {
         Task<IEnumerable<MongoUserEntity>> GetAllFriendsAsync(int level);
         
-        Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken);
+        Task<bool> IsDatabaseEmpty();
 
-        Task EmptyDatabase(CancellationToken cancellationToken);
+        Task EmptyDatabase();
     }
 }

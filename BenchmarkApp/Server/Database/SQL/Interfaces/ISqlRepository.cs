@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.SQL.Entities;
 
@@ -9,8 +8,8 @@ namespace BenchmarkApp.Server.Database.SQL.Interfaces
     {
         Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level);
 
-        Task EmptyDatabase(CancellationToken cancellationToken);
-        
-        bool IsDatabaseEmpty(CancellationToken cancellationToken);
+        Task EmptyDatabase();
+
+        bool IsDatabaseEmpty();
     }
 }

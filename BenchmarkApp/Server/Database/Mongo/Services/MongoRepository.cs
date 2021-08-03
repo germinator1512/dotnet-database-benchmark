@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
@@ -32,16 +31,14 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             int currentLevel = 0)
         {
             await root.LoadFriends(_ctx);
-            
+
             if (currentLevel < nestedLevels)
                 foreach (var friend in root.Friends)
                     await LoadFriendsRecursively(friend, nestedLevels, currentLevel + 1);
         }
-        
-        public async Task<bool> IsDatabaseEmpty(CancellationToken cancellationToken)
-            => !(await _ctx.Users.Find(_ => true).ToListAsync(cancellationToken)).Any();
 
-        public async Task EmptyDatabase(CancellationToken cancellationToken)
-            => await _ctx.Users.DeleteManyAsync(u => true, cancellationToken);
+        public async Task<bool> IsDatabaseEmpty() => !(await _ctx.Users.Find(_ => true).ToListAsync()).Any();
+
+        public async Task EmptyDatabase() => await _ctx.Users.DeleteManyAsync(u => true);
     }
 }

@@ -5,29 +5,46 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using BenchmarkApp.Server.Database.Neo4J.Interfaces;
+using BenchmarkApp.Shared;
 using Neo4jClient;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
-    public class Neo4JDataService
+    public class Neo4JInitializerService
     {
         private readonly INeo4JRepository _repository;
         private readonly IGraphClient _client;
 
 
-        public Neo4JDataService(INeo4JRepository neo4JRepository, IGraphClient client)
+        public Neo4JInitializerService(INeo4JRepository neo4JRepository, IGraphClient client)
         {
             _repository = neo4JRepository;
             _client = client;
         }
 
-        public async Task InitializeDb()
+        public async Task<InsertResult> InsertUserDataSet()
         {
-            await _client.ConnectAsync();
-            // await _repository.EmptyDatabase();
+            try
+            {
+                await _client.ConnectAsync();
+                // await _repository.EmptyDatabase();
 
-            var isEmpty = await _repository.IsDatabaseEmpty();
-            if (isEmpty) await AddDataSet();
+                // var isEmpty = await _repository.IsDatabaseEmpty();
+                // if (isEmpty) await AddDataSet();
+                
+                return new InsertResult
+                {
+                    Success = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new InsertResult
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
         }
 
         private async Task AddDataSet()
