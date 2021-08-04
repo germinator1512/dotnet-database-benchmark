@@ -19,16 +19,16 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             _repository = repository;
         }
 
-        public async Task<InsertResult> InsertUserDataSet()
+        public async Task<InsertResult> InsertUserDataSetAsync()
         {
             try
             {
                 // await _context.Database.MigrateAsync();
                 // await _context.SaveChangesAsync();
                 //
-                // await _repository.EmptyDatabase();
+                // await _repository.EmptyDatabaseAsync();
                 //
-                // if (_repository.IsDatabaseEmpty())
+                // if (_repository.IsDatabaseEmptyAsync())
                 //     await AddDataSet();
 
                 return new InsertResult
@@ -47,7 +47,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         }
 
 
-        private async Task AddDataSet()
+        private async Task AddDataSetAsync()
         {
             Console.WriteLine("No entities found in PostgresDb - Inserting Test Dataset");
 
@@ -58,7 +58,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             await _context.Users.AddAsync(firstUser);
 
-            await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
+            await AddFriendRecursiveAsync(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
 
             await _context.SaveChangesAsync();
         }
@@ -71,7 +71,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         /// <param name="howMany">number of new entities to be added to friends list of root user</param>
         /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
         /// <param name="currentLevel">current level of function call</param>
-        private static async Task AddFriendRecursively(
+        private static async Task AddFriendRecursiveAsync(
             SqlUserEntity root,
             int howMany,
             int nestedLevels,
@@ -81,7 +81,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in root.FriendShips.Select(f => f.FriendB))
-                    await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
+                    await AddFriendRecursiveAsync(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
 
 

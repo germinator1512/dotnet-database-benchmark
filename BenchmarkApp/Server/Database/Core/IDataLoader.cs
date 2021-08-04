@@ -9,14 +9,14 @@ namespace BenchmarkApp.Server.Database.Core
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
-        Task<int> LoadNestedEntities(int level);
+        Task<int> LoadNestedEntitiesAsync(int level);
 
         /// <summary>
         /// loads 10 ^ level users from database
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
-        Task<int> LoadEntities(int level);
+        Task<int> LoadEntitiesAsync(int level);
 
         /// <summary>
         /// connects to database to avoid "cold start" issues
@@ -28,12 +28,12 @@ namespace BenchmarkApp.Server.Database.Core
         /// Truncates all Data from Database
         /// </summary>
         /// <returns></returns>
-        Task EmptyDatabase();
+        Task EmptyDatabaseAsync();
 
         /// <summary>
         /// Checks if database contains any data
         /// </summary>
         /// <returns></returns>
-        Task<bool> IsDatabaseEmpty();
+        Task<bool> IsDatabaseEmptyAsync();
     }
 }

@@ -20,13 +20,13 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             _context = context;
         }
 
-        public async Task<InsertResult> InsertUserDataSet()
+        public async Task<InsertResult> InsertUserDataSetAsync()
         {
             try
             {
-                // await _mongoRepository.EmptyDatabase();
+                // await _mongoRepository.EmptyDatabaseAsync();
 
-                // if (await _mongoRepository.IsDatabaseEmpty())
+                // if (await _mongoRepository.IsDatabaseEmptyAsync())
                 // await AddDataSet();
 
                 return new InsertResult
@@ -45,7 +45,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         }
 
 
-        private async Task AddDataSet()
+        private async Task AddDataSetAsync()
         {
             Console.WriteLine("No entities found in MongoDB - Inserting Test Dataset");
 
@@ -54,7 +54,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 Name = Config.RootUserName,
             };
 
-            await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
+            await AddFriendRecursiveAsync(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
             await _context.Users.InsertOneAsync(firstUser);
         }
 
@@ -65,7 +65,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         /// <param name="howMany">number of new entities to be added to friends list of root user</param>
         /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
         /// <param name="currentLevel">current level of function call</param>
-        private async Task AddFriendRecursively(
+        private async Task AddFriendRecursiveAsync(
             MongoUserEntity root,
             int howMany,
             int nestedLevels,
@@ -80,7 +80,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in friends)
-                    await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
+                    await AddFriendRecursiveAsync(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
 
             await _context.Users.InsertManyAsync(friends);
 

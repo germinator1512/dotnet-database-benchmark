@@ -9,22 +9,36 @@ namespace BenchmarkApp.Server.Database.Core
 {
     public class TimerService
     {
-        public static async Task<IEnumerable<BenchmarkResult>> Benchmark<T>(IDataLoader<T> loader,
+        /// <summary>
+        /// executes the given function with 0 .. Config.NestedUsers as parameters
+        /// </summary>
+        /// <param name="loader">repository to connect to</param>
+        /// <param name="benchmarkFunction">function to execute </param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>List of Benchmark-results of given function</returns>
+        public static async Task<IEnumerable<BenchmarkResult>> BenchmarkAsync<T>(
+            IDataLoader<T> loader,
             Func<int, Task<int>> benchmarkFunction)
         {
             await loader.ConnectAsync();
 
             var results = new List<BenchmarkResult>();
-            foreach (var i in Enumerable.Range(0, Config.NestedUserLevels))
+            foreach (var level in Enumerable.Range(0, Config.NestedUserLevels))
             {
-                var result = await GetExecutionTime(benchmarkFunction, i);
+                var result = await ExecuteBenchmarkAsync(benchmarkFunction, level);
                 results.Add(result);
             }
 
             return results;
         }
 
-        private static async Task<BenchmarkResult> GetExecutionTime(
+        /// <summary>
+        /// measures execution time of the given function
+        /// </summary>
+        /// <param name="timerFunction">function to execute</param>
+        /// <param name="level">parameter for timerFunction</param>
+        /// <returns></returns>
+        private static async Task<BenchmarkResult> ExecuteBenchmarkAsync(
             Func<int, Task<int>> timerFunction,
             int level)
         {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services.Interfaces;
@@ -14,9 +13,9 @@ namespace BenchmarkApp.Server.Services
         public SqlBenchmarkService(IDataLoader<SqlRepository> sqlRepository) => _sqlRepository = sqlRepository;
 
         public async Task<IEnumerable<BenchmarkResult>> StartFriendsWithNeighboursBenchmarkAsync() =>
-            await TimerService.Benchmark(_sqlRepository, _sqlRepository.LoadNestedEntities);
+            await TimerService.BenchmarkAsync(_sqlRepository, _sqlRepository.LoadNestedEntitiesAsync);
 
         public async Task<IEnumerable<BenchmarkResult>> StartUserBenchmarkAsync() =>
-            await TimerService.Benchmark(_sqlRepository, _sqlRepository.LoadEntities);
+            await TimerService.BenchmarkAsync(_sqlRepository, _sqlRepository.LoadEntitiesAsync);
     }
 }

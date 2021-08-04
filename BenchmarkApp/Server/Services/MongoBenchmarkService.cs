@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Services;
 using BenchmarkApp.Server.Services.Interfaces;
@@ -16,9 +15,9 @@ namespace BenchmarkApp.Server.Services
             _mongoRepository = mongoRepository;
 
         public async Task<IEnumerable<BenchmarkResult>> StartFriendsWithNeighboursBenchmarkAsync() =>
-            await TimerService.Benchmark(_mongoRepository, _mongoRepository.LoadNestedEntities);
+            await TimerService.BenchmarkAsync(_mongoRepository, _mongoRepository.LoadNestedEntitiesAsync);
 
         public async Task<IEnumerable<BenchmarkResult>> StartUserBenchmarkAsync() =>
-            await TimerService.Benchmark(_mongoRepository, _mongoRepository.LoadEntities);
+            await TimerService.BenchmarkAsync(_mongoRepository, _mongoRepository.LoadEntitiesAsync);
     }
 }

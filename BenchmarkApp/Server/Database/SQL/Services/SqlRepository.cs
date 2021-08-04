@@ -12,25 +12,25 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public async Task<int> LoadEntities(int level)
+        public async Task<int> LoadEntitiesAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
             var users = _ctx.Users.Take(howMany);
             var asyncUsers = await users.ToListAsync();
             return asyncUsers.Count;
         }
-        public async Task ConnectAsync() => await LoadEntities(1);
+        public async Task ConnectAsync() => await LoadEntitiesAsync(1);
 
-        public async Task EmptyDatabase()
+        public async Task EmptyDatabaseAsync()
         {
             _ctx.Friendships.RemoveRange(_ctx.Friendships);
             _ctx.Users.RemoveRange(_ctx.Users);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task<bool> IsDatabaseEmpty() => await Task.FromResult(!_ctx.Users.Any());
+        public async Task<bool> IsDatabaseEmptyAsync() => await Task.FromResult(!_ctx.Users.Any());
 
-        public async Task<int> LoadNestedEntities(int level)
+        public async Task<int> LoadNestedEntitiesAsync(int level)
         {
             var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals(Config.RootUserName));
 

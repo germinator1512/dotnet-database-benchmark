@@ -12,7 +12,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         private readonly MongoDatabaseContext _ctx;
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<int> LoadNestedEntities(int level)
+        public async Task<int> LoadNestedEntitiesAsync(int level)
         {
             var user = await _ctx.Users
                 .Find(u => u.Name == Config.RootUserName)
@@ -23,14 +23,14 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return (int) Math.Pow(Config.FriendsPerUser, level + 1);
         }
 
-        public async Task<int> LoadEntities(int level)
+        public async Task<int> LoadEntitiesAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
             var users = await _ctx.Users.Find(_ => true).Limit(howMany).ToListAsync();
             return users.Count;
         }
 
-        public async Task ConnectAsync() => await IsDatabaseEmpty();
+        public async Task ConnectAsync() => await IsDatabaseEmptyAsync();
 
         private async Task LoadFriendsRecursively(
             MongoUserEntity root,
@@ -44,8 +44,8 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                     await LoadFriendsRecursively(friend, nestedLevels, currentLevel + 1);
         }
 
-        public async Task<bool> IsDatabaseEmpty() => !(await _ctx.Users.Find(_ => true).ToListAsync()).Any();
+        public async Task<bool> IsDatabaseEmptyAsync() => !(await _ctx.Users.Find(_ => true).ToListAsync()).Any();
 
-        public async Task EmptyDatabase() => await _ctx.Users.DeleteManyAsync(u => true);
+        public async Task EmptyDatabaseAsync() => await _ctx.Users.DeleteManyAsync(u => true);
     }
 }

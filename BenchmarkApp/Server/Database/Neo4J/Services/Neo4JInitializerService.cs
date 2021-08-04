@@ -14,21 +14,20 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         private readonly IDataLoader<Neo4JRepository> _repository;
         private readonly IGraphClient _client;
 
-
         public Neo4JInitializerService(IDataLoader<Neo4JRepository> neo4JRepository, IGraphClient client)
         {
             _repository = neo4JRepository;
             _client = client;
         }
 
-        public async Task<InsertResult> InsertUserDataSet()
+        public async Task<InsertResult> InsertUserDataSetAsync()
         {
             try
             {
                 await _client.ConnectAsync();
-                // await _repository.EmptyDatabase();
+                // await _repository.EmptyDatabaseAsync();
 
-                // var isEmpty = await _repository.IsDatabaseEmpty();
+                // var isEmpty = await _repository.IsDatabaseEmptyAsync();
                 // if (isEmpty) await AddDataSet();
 
                 return new InsertResult
@@ -46,7 +45,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             }
         }
 
-        private async Task AddDataSet()
+        private async Task AddDataSetAsync()
         {
             Console.WriteLine("No entities found in Neo4J - Inserting Test Dataset");
 
@@ -57,9 +56,9 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 Id = Guid.NewGuid().ToString()
             };
 
-            await InsertSingleUser(firstUser);
+            await InsertSingleUserAsync(firstUser);
 
-            await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
+            await AddFriendRecursiveAsync(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
         }
 
         /// <summary>
@@ -69,18 +68,18 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         /// <param name="howMany">number of new entities to be added to friends list of root user</param>
         /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
         /// <param name="currentLevel">current level of function call</param>
-        private async Task AddFriendRecursively(
+        private async Task AddFriendRecursiveAsync(
             Neo4JUserEntity root,
             int howMany,
             int nestedLevels,
             int currentLevel = 1)
         {
             var friends = GenerateFriends(howMany, currentLevel);
-            await InsertUsersAsFriends(root, friends);
+            await InsertUsersAsFriendsAsync(root, friends);
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in friends)
-                    await AddFriendRecursively(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
+                    await AddFriendRecursiveAsync(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
 
         private static IEnumerable<Neo4JUserEntity> GenerateFriends(
@@ -94,13 +93,13 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                     Id = Guid.NewGuid().ToString()
                 }).ToList();
 
-        private async Task InsertSingleUser(Neo4JUserEntity single)
+        private async Task InsertSingleUserAsync(Neo4JUserEntity single)
             => await _client.Cypher
                 .Create("(user:User {name: $name, id: $id})")
                 .WithParams(single.ToMap())
                 .ExecuteWithoutResultsAsync();
 
-        private async Task InsertUsersAsFriends(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
+        private async Task InsertUsersAsFriendsAsync(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
             => await _client.Cypher
                 .Match("(root:User)")
                 .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)

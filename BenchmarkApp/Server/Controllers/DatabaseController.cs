@@ -32,21 +32,21 @@ namespace BenchmarkApp.Server.Controllers
         public async Task<InsertResult> Mongo()
         {
             _logger.Log(LogLevel.Debug, "Starting Mongo Data Insertion");
-            return await _mongoInitializerService.InsertUserDataSet();
+            return await _mongoInitializerService.InsertUserDataSetAsync();
         }
 
         [HttpGet("sql")]
         public async Task<InsertResult> Sql()
         {
             _logger.Log(LogLevel.Debug, "Starting SQL Data Insertion");
-            return await _postgresService.InsertUserDataSet();
+            return await _postgresService.InsertUserDataSetAsync();
         }
 
         [HttpGet("neo4j")]
         public async Task<InsertResult> Neo4J()
         {
             _logger.Log(LogLevel.Debug, "Starting Neo4J Data Insertion");
-            return await _neo4JInitializerService.InsertUserDataSet();
+            return await _neo4JInitializerService.InsertUserDataSetAsync();
         }
     }
 }
