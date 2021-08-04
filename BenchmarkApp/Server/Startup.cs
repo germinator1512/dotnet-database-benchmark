@@ -1,15 +1,13 @@
 using System;
+using BenchmarkApp.Server.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using BenchmarkApp.Server.Database.Mongo.Services;
 using BenchmarkApp.Server.Database.Neo4J;
-using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using BenchmarkApp.Server.Database.Neo4J.Services;
-using BenchmarkApp.Server.Database.SQL.Interfaces;
 using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services;
 using BenchmarkApp.Server.Services.Interfaces;
@@ -52,14 +50,15 @@ namespace BenchmarkApp.Server
             services.AddSingleton<IGraphClient>(neo4JClient);
             services.AddTransient<MongoDatabaseContext>();
 
-            services.AddTransient<IMongoRepository, MongoRepository>();
-            services.AddTransient<INeo4JRepository, Neo4JRepository>();
-            services.AddTransient<ISqlRepository, SqlRepository>();
+            services.AddTransient<IDataLoader<MongoRepository>, MongoRepository>();
+            services.AddTransient<IDataLoader<Neo4JRepository>, Neo4JRepository>();
+            services.AddTransient<IDataLoader<SqlRepository>, SqlRepository>();
 
-            services.AddTransient<IMongoBenchmarkService, MongoBenchmarkService>();
-            services.AddTransient<INeo4JBenchmarkService, Neo4JBenchmarkService>();
-            services.AddTransient<ISQLBenchmarkService, SqlBenchmarkService>();
+            services.AddTransient<IBenchmarkService<MongoBenchmarkService>, MongoBenchmarkService>();
+            services.AddTransient<IBenchmarkService<Neo4JBenchmarkService>, Neo4JBenchmarkService>();
+            services.AddTransient<IBenchmarkService<SqlBenchmarkService>, SqlBenchmarkService>();
 
+            services.AddTransient<TimerService>();
 
             // database initialization
             services.AddTransient<PostgresInitializerService>();

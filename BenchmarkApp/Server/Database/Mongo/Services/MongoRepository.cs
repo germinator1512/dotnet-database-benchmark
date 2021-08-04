@@ -1,20 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
-using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Services
 {
-    public class MongoRepository : IMongoRepository
+    public class MongoRepository : IDataLoader<MongoRepository>
     {
         private readonly MongoDatabaseContext _ctx;
-
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<IEnumerable<MongoUserEntity>> GetAllFriendsAsync(int level)
+        public async Task<int> GetAllFriendsAsync(int level)
         {
             var user = await _ctx.Users
                 .Find(u => u.Name == Config.RootUserName)
@@ -22,12 +20,14 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             await LoadFriendsRecursively(user, level);
 
-            return user.Friends;
+            return (int) Math.Pow(Config.FriendsPerUser, level + 1);
         }
 
-        public async Task<IEnumerable<MongoUserEntity>> GetUserAsync(int howMany)
+        public async Task<int> GetUserAsync(int level)
         {
-            return await _ctx.Users.Find(_ => true).Limit(howMany).ToListAsync();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+            var users = await _ctx.Users.Find(_ => true).Limit(howMany).ToListAsync();
+            return users.Count;
         }
 
         public async Task ConnectAsync() => await IsDatabaseEmpty();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BenchmarkApp.Server.Services;
 using BenchmarkApp.Server.Services.Interfaces;
 using BenchmarkApp.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +13,14 @@ namespace BenchmarkApp.Server.Controllers
     public class BenchmarkController : ControllerBase
     {
         private readonly ILogger<BenchmarkController> _logger;
-        private readonly IMongoBenchmarkService _mongoBenchmarkService;
-        private readonly ISQLBenchmarkService _sqlBenchmarkService;
-        private readonly INeo4JBenchmarkService _neo4JBenchmarkService;
+        private readonly IBenchmarkService<MongoBenchmarkService> _mongoBenchmarkService;
+        private readonly IBenchmarkService<SqlBenchmarkService> _sqlBenchmarkService;
+        private readonly IBenchmarkService<Neo4JBenchmarkService> _neo4JBenchmarkService;
 
         public BenchmarkController(ILogger<BenchmarkController> logger,
-            IMongoBenchmarkService mongoBenchmarkService,
-            ISQLBenchmarkService sqlBenchmarkService,
-            INeo4JBenchmarkService neo4JBenchmarkService
+            IBenchmarkService<MongoBenchmarkService> mongoBenchmarkService,
+            IBenchmarkService<SqlBenchmarkService> sqlBenchmarkService,
+            IBenchmarkService<Neo4JBenchmarkService> neo4JBenchmarkService
         )
         {
             _logger = logger;

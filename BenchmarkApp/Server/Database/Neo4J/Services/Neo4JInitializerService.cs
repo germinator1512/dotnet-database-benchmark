@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
-using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using BenchmarkApp.Shared;
 using Neo4jClient;
 
@@ -12,11 +11,11 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
     public class Neo4JInitializerService
     {
-        private readonly INeo4JRepository _repository;
+        private readonly IDataLoader<Neo4JRepository> _repository;
         private readonly IGraphClient _client;
 
 
-        public Neo4JInitializerService(INeo4JRepository neo4JRepository, IGraphClient client)
+        public Neo4JInitializerService(IDataLoader<Neo4JRepository> neo4JRepository, IGraphClient client)
         {
             _repository = neo4JRepository;
             _client = client;
@@ -31,7 +30,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
                 // var isEmpty = await _repository.IsDatabaseEmpty();
                 // if (isEmpty) await AddDataSet();
-                
+
                 return new InsertResult
                 {
                     Success = true
@@ -58,7 +57,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 Id = Guid.NewGuid().ToString()
             };
 
-            await _repository.InsertSingleUser(firstUser);
+            await InsertSingleUser(firstUser);
 
             await AddFriendRecursively(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
         }
@@ -77,7 +76,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             int currentLevel = 1)
         {
             var friends = GenerateFriends(howMany, currentLevel);
-            await _repository.InsertUsersAsFriends(root, friends);
+            await InsertUsersAsFriends(root, friends);
 
             if (currentLevel < nestedLevels)
                 foreach (var friend in friends)
@@ -94,5 +93,20 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                     Name = Config.UserName(level, z),
                     Id = Guid.NewGuid().ToString()
                 }).ToList();
+
+        public async Task InsertSingleUser(Neo4JUserEntity single)
+            => await _client.Cypher
+                .Create("(user:User {name: $name, id: $id})")
+                .WithParams(single.ToMap())
+                .ExecuteWithoutResultsAsync();
+
+        public async Task InsertUsersAsFriends(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
+            => await _client.Cypher
+                .Match("(root:User)")
+                .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)
+                .Unwind(friends, "friend")
+                .Merge("(user:User {name: friend.name, id: friend.id}) <-[:KNOWS]-(root)")
+                .WithParam("rootId", rootUser.Id)
+                .ExecuteWithoutResultsAsync();
     }
 }

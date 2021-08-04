@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
-using BenchmarkApp.Server.Database.Neo4J.Interfaces;
 using Neo4jClient;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
-    public class Neo4JRepository : INeo4JRepository
+    public class Neo4JRepository : IDataLoader<Neo4JRepository>
     {
         private readonly IGraphClient _client;
         public Neo4JRepository(IGraphClient client) => _client = client;
@@ -19,7 +19,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             await GetAllFriendsAsync(0);
         }
 
-        public async Task<IEnumerable<Neo4JUserEntity>> GetAllFriendsAsync(int level)
+        public async Task<int> GetAllFriendsAsync(int level)
         {
             var result = await _client.Cypher
                 .Match(GenerateQueryString(level))
@@ -27,18 +27,20 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Return<Neo4JUserEntity>("rootUser")
                 .ResultsAsync;
 
-            return result.Single().Friends;
+            return (int) Math.Pow(Config.FriendsPerUser, level + 1);
         }
 
-        public async Task<IEnumerable<Neo4JUserEntity>> GetUserAsync(int howMany)
+        public async Task<int> GetUserAsync(int level)
         {
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
             var result = await _client.Cypher
                 .Match("(user:User)")
                 .Return<Neo4JUserEntity>("user")
                 .Limit(howMany)
                 .ResultsAsync;
 
-            return result;
+            return result.Count();
         }
 
 
@@ -89,21 +91,6 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             => await _client.Cypher
                 .Match("(n)")
                 .DetachDelete("n")
-                .ExecuteWithoutResultsAsync();
-
-        public async Task InsertSingleUser(Neo4JUserEntity single)
-            => await _client.Cypher
-                .Create("(user:User {name: $name, id: $id})")
-                .WithParams(single.ToMap())
-                .ExecuteWithoutResultsAsync();
-
-        public async Task InsertUsersAsFriends(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
-            => await _client.Cypher
-                .Match("(root:User)")
-                .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)
-                .Unwind(friends, "friend")
-                .Merge("(user:User {name: friend.name, id: friend.id}) <-[:KNOWS]-(root)")
-                .WithParam("rootId", rootUser.Id)
                 .ExecuteWithoutResultsAsync();
     }
 }

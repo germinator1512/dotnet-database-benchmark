@@ -1,31 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
-using BenchmarkApp.Server.Database.SQL.Entities;
-using BenchmarkApp.Server.Database.SQL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BenchmarkApp.Server.Database.SQL.Services
 {
-    public class SqlRepository : ISqlRepository
+    public class SqlRepository : IDataLoader<SqlRepository>
     {
         private readonly SqlDatabaseContext _ctx;
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public Task<List<SqlUserEntity>> GetUserAsync(int howMany)
+        public async Task<int> GetUserAsync(int level)
         {
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
             var users = _ctx.Users.Take(howMany);
-            return users.ToListAsync();
+            var asyncUsers = await users.ToListAsync();
+            return asyncUsers.Count;
         }
-
-        // user to avoid "cold start" of database in first benchmark run
-        public async Task ConnectAsync()
-        {
-            await GetUserAsync((int) Math.Pow(5, 5));
-        }
+        public async Task ConnectAsync() => await GetUserAsync(1);
 
         public async Task EmptyDatabase()
         {
@@ -34,13 +28,13 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             await _ctx.SaveChangesAsync();
         }
 
-        public bool IsDatabaseEmpty() => !_ctx.Users.Any();
+        public async Task<bool> IsDatabaseEmpty() => await Task.FromResult(!_ctx.Users.Any());
 
-        public async Task<IEnumerable<SqlFriendshipEntity>> GetAllFriendsAsync(int level)
+        public async Task<int> GetAllFriendsAsync(int level)
         {
             var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals(Config.RootUserName));
 
-            return await _ctx.Friendships
+            var all = await _ctx.Friendships
                 .Where(f => f.FriendA.Id == firstUser.Id)
                 .Include(f => f.FriendB)
                 .If(level > 0, level1 => level1
@@ -60,6 +54,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                                     .ThenInclude(f => f.FriendB)
                                 )))))
                 .ToListAsync();
+
+            return (int) Math.Pow(Config.FriendsPerUser, level + 1);
         }
     }
 }

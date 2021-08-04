@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Entities;
-using BenchmarkApp.Server.Database.Mongo.Interfaces;
 using BenchmarkApp.Shared;
 using MongoDB.Driver;
 
@@ -12,12 +11,12 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 {
     public class MongoInitializerService
     {
-        private readonly IMongoRepository _repository;
+        private readonly IDataLoader<MongoRepository> _mongoRepository;
         private readonly MongoDatabaseContext _context;
 
-        public MongoInitializerService(IMongoRepository repository, MongoDatabaseContext context)
+        public MongoInitializerService(IDataLoader<MongoRepository> repository, MongoDatabaseContext context)
         {
-            _repository = repository;
+            _mongoRepository = repository;
             _context = context;
         }
 
@@ -25,10 +24,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             try
             {
-                // await repository.EmptyDatabase(cancellationToken);
+                // await _mongoRepository.EmptyDatabase();
 
-                // if (await _repository.IsDatabaseEmpty())
-                //     await AddDataSet();
+                // if (await _mongoRepository.IsDatabaseEmpty())
+                // await AddDataSet();
 
                 return new InsertResult
                 {

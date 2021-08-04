@@ -1,23 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
-using BenchmarkApp.Server.Database.SQL.Interfaces;
 using BenchmarkApp.Shared;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BenchmarkApp.Server.Database.SQL.Services
 {
     public class PostgresInitializerService
     {
         private readonly SqlDatabaseContext _context;
-        private readonly ISqlRepository _repository;
+        private readonly IDataLoader<SqlRepository> _repository;
 
-        public PostgresInitializerService(SqlDatabaseContext context, ISqlRepository repository)
+        public PostgresInitializerService(SqlDatabaseContext context, IDataLoader<SqlRepository> repository)
         {
             _context = context;
             _repository = repository;
