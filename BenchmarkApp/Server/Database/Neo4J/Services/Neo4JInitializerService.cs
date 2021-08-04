@@ -94,13 +94,13 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                     Id = Guid.NewGuid().ToString()
                 }).ToList();
 
-        public async Task InsertSingleUser(Neo4JUserEntity single)
+        private async Task InsertSingleUser(Neo4JUserEntity single)
             => await _client.Cypher
                 .Create("(user:User {name: $name, id: $id})")
                 .WithParams(single.ToMap())
                 .ExecuteWithoutResultsAsync();
 
-        public async Task InsertUsersAsFriends(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
+        private async Task InsertUsersAsFriends(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
             => await _client.Cypher
                 .Match("(root:User)")
                 .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)

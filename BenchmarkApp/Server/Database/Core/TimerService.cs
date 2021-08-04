@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Shared;
 
-namespace BenchmarkApp.Server.Database
+namespace BenchmarkApp.Server.Database.Core
 {
     public class TimerService
     {
-        public TimerService()
-        {
-        }
-
         public static async Task<IEnumerable<BenchmarkResult>> Benchmark<T>(IDataLoader<T> loader,
             Func<int, Task<int>> benchmarkFunction)
         {

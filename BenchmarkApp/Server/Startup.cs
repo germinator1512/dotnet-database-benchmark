@@ -1,5 +1,6 @@
 using System;
 using BenchmarkApp.Server.Database;
+using BenchmarkApp.Server.Database.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

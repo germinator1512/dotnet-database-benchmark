@@ -12,14 +12,14 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public SqlRepository(SqlDatabaseContext context) => _ctx = context;
 
-        public async Task<int> GetUserAsync(int level)
+        public async Task<int> LoadEntities(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
             var users = _ctx.Users.Take(howMany);
             var asyncUsers = await users.ToListAsync();
             return asyncUsers.Count;
         }
-        public async Task ConnectAsync() => await GetUserAsync(1);
+        public async Task ConnectAsync() => await LoadEntities(1);
 
         public async Task EmptyDatabase()
         {
@@ -30,7 +30,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public async Task<bool> IsDatabaseEmpty() => await Task.FromResult(!_ctx.Users.Any());
 
-        public async Task<int> GetAllFriendsAsync(int level)
+        public async Task<int> LoadNestedEntities(int level)
         {
             var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals(Config.RootUserName));
 

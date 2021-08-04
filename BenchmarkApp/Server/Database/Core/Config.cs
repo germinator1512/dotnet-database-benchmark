@@ -5,7 +5,7 @@
         public static string UserName(int level, int number) => $"Level {level} Friend {number}";
 
         public const string RootUserName = "Max Mustermann";
-        public const int NestedUserLevels = 3;
+        public const int NestedUserLevels = 5;
         public const int FriendsPerUser = 10;
     }
 }

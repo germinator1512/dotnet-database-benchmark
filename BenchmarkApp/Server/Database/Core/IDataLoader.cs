@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace BenchmarkApp.Server.Database
+namespace BenchmarkApp.Server.Database.Core
 {
     public interface IDataLoader<T>
     {
@@ -9,14 +9,14 @@ namespace BenchmarkApp.Server.Database
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
-        Task<int> GetAllFriendsAsync(int level);
+        Task<int> LoadNestedEntities(int level);
 
         /// <summary>
         /// loads 10 ^ level users from database
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
-        Task<int> GetUserAsync(int level);
+        Task<int> LoadEntities(int level);
 
         /// <summary>
         /// connects to database to avoid "cold start" issues

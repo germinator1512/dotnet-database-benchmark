@@ -16,10 +16,10 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         public async Task ConnectAsync()
         {
             await _client.ConnectAsync();
-            await GetAllFriendsAsync(0);
+            await LoadNestedEntities(0);
         }
 
-        public async Task<int> GetAllFriendsAsync(int level)
+        public async Task<int> LoadNestedEntities(int level)
         {
             var result = await _client.Cypher
                 .Match(GenerateQueryString(level))
@@ -30,7 +30,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             return (int) Math.Pow(Config.FriendsPerUser, level + 1);
         }
 
-        public async Task<int> GetUserAsync(int level)
+        public async Task<int> LoadEntities(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
