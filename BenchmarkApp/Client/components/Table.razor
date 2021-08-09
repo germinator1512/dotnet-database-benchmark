@@ -13,9 +13,9 @@
     @foreach (var result in Results)
     {
         <tr>
-            <td style="width: 10%">@result.Level</td>
-            <td style="width: 10%">@result.LoadedEntities</td>
-            <td style="width: 10%">@result.MilliSeconds Milliseconds</td>
+            <td>@result.Level</td>
+            <td>@result.LoadedEntities</td>
+            <td>@result.MilliSeconds Milliseconds</td>
             <td style="@GetStyle(@result)">@result.Success</td>
         </tr>
     }
@@ -29,6 +29,5 @@
 
     private string GetStyle(BenchmarkResult result) =>
         result.Success ? "width: 10%; color:green" : "width: 10%; color:red";
-
 
 }
