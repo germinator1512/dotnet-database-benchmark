@@ -1,7 +1,5 @@
 ﻿@page "/"
-@using BenchmarkApp.Shared
 @inject HttpClient Http
-
 
 <h4>Benchmark Administration</h4>
 
@@ -9,73 +7,12 @@
     Before starting the benchmark, make sure all databases are filled with test data! Depending on the cpu cores and ram of the docker containers, this may take a while!
 </div>
 
-<div class="margin">
+<InsertButton DatabaseName="Postgres" Url="database/sql"></InsertButton>
 
-    <button class="btn btn-primary" @onclick="InsertSqlDataSet">Insert Sql Dataset</button>
+<InsertButton DatabaseName="Mongo" Url="database/mongo"></InsertButton>
 
-    @if (_sqlLoading)
-    {
-        <span style="margin-left: 15px"> ..Postgres Database is filled, please wait</span>
-    }
-    @if (_sqlResult is {Success: true })
-    {
-        <span style="margin-left: 15px"> Postgres Database was filled successfully</span>
-    }
-</div>
-
-<div class="margin">
-    <button class="btn btn-primary" @onclick="InsertMongoDataSet">Insert Mongo Dataset</button>
-    @if (_mongoLoading)
-    {
-        <span style="margin-left: 15px"> ..Mongo Database is filled, please wait</span>
-    }
-    @if (_mongoResult is {Success: true })
-    {
-        <span style="margin-left: 15px"> Mongo Database was filled successfully</span>
-    }
-</div>
-
-<div class="margin">
-    <button class="btn btn-primary" @onclick="InsertNeoDataSet">Insert Neo4J Dataset</button>
-    @if (_neoLoading)
-    {
-        <span style="margin-left: 15px"> ..Neo4j Database is filled, please wait</span>
-    }
-    @if (_neoResult is {Success: true })
-    {
-        <span style="margin-left: 15px"> Neo4j Database was filled successfully</span>
-    }
-</div>
+<InsertButton DatabaseName="Neo4j" Url="database/neo4j"></InsertButton>
 
 @code {
-    private InsertResult _sqlResult;
-    private InsertResult _mongoResult;
-    private InsertResult _neoResult;
-
-    private bool _sqlLoading;
-    private bool _mongoLoading;
-    private bool _neoLoading;
-
-    private async Task InsertSqlDataSet()
-    {
-        _sqlLoading = true;
-        _sqlResult = await Http.GetFromJsonAsync<InsertResult>("database/sql");
-        _sqlLoading = false;
-    }
-
-    private async Task InsertMongoDataSet()
-    {
-        _mongoLoading = true;
-        _mongoResult = await Http.GetFromJsonAsync<InsertResult>("database/mongo");
-        _mongoLoading = false;
-    }
-
-    private async Task InsertNeoDataSet()
-    {
-        _neoLoading = true;
-
-        _neoResult = await Http.GetFromJsonAsync<InsertResult>("database/neo4j");
-        _neoLoading = false;
-    }
 
 }

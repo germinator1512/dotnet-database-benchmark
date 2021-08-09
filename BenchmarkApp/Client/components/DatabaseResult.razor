@@ -1,0 +1,71 @@
+﻿@using BenchmarkApp.Shared
+@inject HttpClient Http
+
+<h4>@Title</h4>
+
+<div class="margin">
+
+    <div style="height: 20px"> </div>
+
+    <div class="margin">
+        <button class="btn btn-primary" @onclick="(async () => await StartUserBenchmark())">Start User Benchmark</button>
+        <span> Loading n random users from Database</span>
+    </div>
+    <div style="height: 15px"> </div>
+
+    @if (_results != null)
+    {
+        <h4>User Benchmark Results</h4>
+        <Table Results="_results"></Table>
+    }
+
+    <div style="height: 20px"> </div>
+
+    <div class="margin">
+        <button class="btn btn-primary" @onclick="(async () => await StartNeighbourBenchmark())">Start Neighbours Benchmark</button>
+        <span> Finding specific user and loading n level of friends (Every User has 10 friends) </span>
+    </div>
+
+    <div style="height: 15px"> </div>
+
+    @if (_neighbourResults != null)
+    {
+        <h4>Neighbour Benchmark Results</h4>
+        <Table Results="_neighbourResults"></Table>
+    }
+
+
+    @if (_isLoading)
+    {
+        <div class="margin">
+            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    private IEnumerable<BenchmarkResult> _neighbourResults;
+    private IEnumerable<BenchmarkResult> _results;
+
+    private bool _isLoading;
+
+    private async Task StartNeighbourBenchmark() => _neighbourResults = await CallApi($"benchmark/{BaseUrl}/neighbour");
+
+    private async Task StartUserBenchmark() => _results = await CallApi($"benchmark/{BaseUrl}/user");
+
+    private async Task<IEnumerable<BenchmarkResult>> CallApi(string url)
+    {
+        _isLoading = true;
+        var result = await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>(url);
+        _isLoading = false;
+        return result;
+    }
+
+}

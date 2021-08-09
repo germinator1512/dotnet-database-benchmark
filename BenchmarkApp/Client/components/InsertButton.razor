@@ -1,0 +1,40 @@
+﻿@using BenchmarkApp.Shared
+@inject HttpClient Http
+
+
+<div class="margin">
+
+    <button class="btn btn-primary" @onclick="(async () => await InsertDataSet())">Insert @DatabaseName Dataset</button>
+
+    @if (_loading)
+    {
+        <span style="margin-left: 15px">..@DatabaseName Database is filled, please wait</span>
+    }
+    @if (_result is {Success: true })
+    {
+        <span style="margin-left: 15px">@DatabaseName Database was filled successfully</span>
+    }
+    @if (_result is {Success: false })
+    {
+        <span style="margin-left: 15px">An Error occured while filling @DatabaseName Database, please try again</span>
+    }
+</div>
+
+@code {
+    private bool _loading;
+    private InsertResult _result;
+
+    [Parameter]
+    public string DatabaseName { get; set; }
+
+    [Parameter]
+    public string Url { get; set; }
+
+    private async Task InsertDataSet()
+    {
+        _loading = true;
+        _result = await Http.GetFromJsonAsync<InsertResult>(Url);
+        _loading = false;
+    }
+
+}

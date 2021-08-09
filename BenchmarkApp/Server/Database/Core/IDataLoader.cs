@@ -5,14 +5,14 @@ namespace BenchmarkApp.Server.Database.Core
     public interface IDataLoader<T>
     {
         /// <summary>
-        /// loads 10 ^ level nested users from database
+        /// loads 10 users with 10 ^ (level+1) nested users from database
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
         Task<int> LoadNestedEntitiesAsync(int level);
 
         /// <summary>
-        /// loads 10 ^ level users from database
+        /// loads 10 ^ (level + 1) users from database
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
