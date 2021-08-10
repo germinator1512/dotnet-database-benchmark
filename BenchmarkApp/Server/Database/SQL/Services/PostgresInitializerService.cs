@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Entities;
 using BenchmarkApp.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace BenchmarkApp.Server.Database.SQL.Services
 {
@@ -27,13 +28,13 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         {
             try
             {
-                // await _context.Database.MigrateAsync();
-                // await _context.SaveChangesAsync();
-                //
-                // await _repository.EmptyDatabaseAsync();
-                //
-                // if (_repository.IsDatabaseEmptyAsync())
-                //     await AddDataSet();
+                await _context.Database.MigrateAsync();
+                await _context.SaveChangesAsync();
+
+                await _repository.EmptyDatabaseAsync();
+
+                if (await _repository.IsDatabaseEmptyAsync())
+                    await AddDataSetAsync();
 
                 return new InsertResult
                 {

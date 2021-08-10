@@ -28,10 +28,10 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             try
             {
-                // await _mongoRepository.EmptyDatabaseAsync();
+                await _mongoRepository.EmptyDatabaseAsync();
 
-                // if (await _mongoRepository.IsDatabaseEmptyAsync())
-                // await AddDataSet();
+                if (await _mongoRepository.IsDatabaseEmptyAsync())
+                    await AddDataSetAsync();
 
                 return new InsertResult
                 {

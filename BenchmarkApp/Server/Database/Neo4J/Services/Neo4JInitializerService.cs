@@ -15,6 +15,27 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         private readonly IGraphClient _client;
         private readonly FakeDataGeneratorService _faker;
 
+        private const string UserInsert = "(user:User {"
+                                          + "id : $id,"
+                                          + "identifier : $identifier,"
+                                          + "firstName : $firstName,"
+                                          + "lastName : $lastName,"
+                                          + "birthday : $birthday,"
+                                          + "email : $email,"
+                                          + "userName : $userName,"
+                                          + "gender : $gender})";
+
+        private const string UserInsertWithFriends = "(user:User {" +
+                                                     "identifier: friend.identifier, " +
+                                                     "id: friend.id," +
+                                                     "firstName:friend.firstName," +
+                                                     "lastName:friend.lastName," +
+                                                     "birthday: friend.birthday," +
+                                                     "email:friend.email," +
+                                                     "userName:friend.userName," +
+                                                     "gender:friend.gender}" +
+                                                     ") <-[:KNOWS]-(root)";
+
         public Neo4JInitializerService(IDataLoader<Neo4JRepository> neo4JRepository,
             IGraphClient client,
             FakeDataGeneratorService faker)
@@ -29,10 +50,10 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             try
             {
                 await _client.ConnectAsync();
-                // await _repository.EmptyDatabaseAsync();
+                await _repository.EmptyDatabaseAsync();
 
-                // var isEmpty = await _repository.IsDatabaseEmptyAsync();
-                // if (isEmpty) await AddDataSet();
+                var isEmpty = await _repository.IsDatabaseEmptyAsync();
+                if (isEmpty) await AddDataSetAsync();
 
                 return new InsertResult
                 {
@@ -52,8 +73,6 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         private async Task AddDataSetAsync()
         {
             Console.WriteLine("No entities found in Neo4J - Inserting Test Dataset");
-
-            const string firstName = Config.RootUserName;
 
             var firstUser = _faker.GenerateFakeUser<Neo4JUserEntity>(Config.RootUserName);
             firstUser.Id = Guid.NewGuid().ToString();
@@ -98,7 +117,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         private async Task InsertSingleUserAsync(Neo4JUserEntity single)
             => await _client.Cypher
-                .Create("(user:User {name: $name, id: $id})")
+                .Create(UserInsert)
                 .WithParams(single.ToMap())
                 .ExecuteWithoutResultsAsync();
 
@@ -107,7 +126,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Match("(root:User)")
                 .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)
                 .Unwind(friends, "friend")
-                .Merge("(user:User {name: friend.name, id: friend.id}) <-[:KNOWS]-(root)")
+                .Merge(UserInsertWithFriends)
                 .WithParam("rootId", rootUser.Id)
                 .ExecuteWithoutResultsAsync();
     }
