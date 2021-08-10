@@ -5,18 +5,18 @@ namespace BenchmarkApp.Server.Database.Core
 {
     public interface IBaseUser
     {
-        public string Identifier { get; set; }
+        public string Identifier { get; }
         
-        public string FirstName { get; set; }
+        public string FirstName { get; }
 
-        public string LastName { get; set; }
+        public string LastName { get; }
 
-        public DateTime Birthday { get; set; }
+        public DateTime Birthday { get; }
 
-        public string Email { get; set; }
+        public string Email { get; }
 
-        public string UserName { get; set; }
+        public string UserName { get; }
 
-        public Name.Gender Gender { get; set; }
+        public Name.Gender Gender { get; }
     }
 }

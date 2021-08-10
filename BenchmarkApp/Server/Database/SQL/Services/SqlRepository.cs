@@ -19,6 +19,12 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var asyncUsers = await users.ToListAsync();
             return asyncUsers.Count;
         }
+
+        public Task<int> LoadAggregateAsync(int level)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task ConnectAsync() => await LoadEntitiesAsync(1);
 
         public async Task EmptyDatabaseAsync()

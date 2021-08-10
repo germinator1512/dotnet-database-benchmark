@@ -12,6 +12,11 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         private readonly IGraphClient _client;
         public Neo4JRepository(IGraphClient client) => _client = client;
 
+        public Task<int> LoadAggregateAsync(int level)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task ConnectAsync()
         {
             await _client.ConnectAsync();

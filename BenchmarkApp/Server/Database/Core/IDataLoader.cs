@@ -2,6 +2,10 @@
 
 namespace BenchmarkApp.Server.Database.Core
 {
+    /// <summary>
+    /// generic interface for simple extension of benchmark appplication
+    /// </summary>
+    /// <typeparam name="T">Database Repository to load data from</typeparam>
     public interface IDataLoader<T>
     {
         /// <summary>
@@ -17,7 +21,14 @@ namespace BenchmarkApp.Server.Database.Core
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
         Task<int> LoadEntitiesAsync(int level);
-
+        
+        /// <summary>
+        /// loads aggregated value of 10 ^ (level + 1) users from database
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns>total number of loaded entities</returns>
+        Task<int> LoadAggregateAsync(int level);
+       
         /// <summary>
         /// connects to database to avoid "cold start" issues
         /// </summary>

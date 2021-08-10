@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Services;
+using BenchmarkApp.Server.Database.Mongo.Services;
+using BenchmarkApp.Server.Database.Neo4J.Services;
+using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services.Interfaces;
 using BenchmarkApp.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +15,14 @@ namespace BenchmarkApp.Server.Controllers
     public class BenchmarkController : ControllerBase
     {
         private readonly ILogger<BenchmarkController> _logger;
-        private readonly IBenchmarkService<MongoBenchmarkService> _mongoBenchmarkService;
-        private readonly IBenchmarkService<SqlBenchmarkService> _sqlBenchmarkService;
-        private readonly IBenchmarkService<Neo4JBenchmarkService> _neo4JBenchmarkService;
+        private readonly BenchmarkService<MongoRepository> _mongoBenchmarkService;
+        private readonly BenchmarkService<SqlRepository> _sqlBenchmarkService;
+        private readonly BenchmarkService<Neo4JRepository> _neo4JBenchmarkService;
 
         public BenchmarkController(ILogger<BenchmarkController> logger,
-            IBenchmarkService<MongoBenchmarkService> mongoBenchmarkService,
-            IBenchmarkService<SqlBenchmarkService> sqlBenchmarkService,
-            IBenchmarkService<Neo4JBenchmarkService> neo4JBenchmarkService
+            BenchmarkService<MongoRepository> mongoBenchmarkService,
+            BenchmarkService<SqlRepository> sqlBenchmarkService,
+            BenchmarkService<Neo4JRepository> neo4JBenchmarkService
         )
         {
             _logger = logger;
@@ -43,6 +45,14 @@ namespace BenchmarkApp.Server.Controllers
             return await _mongoBenchmarkService.StartUserBenchmarkAsync();
         }
 
+        [HttpGet("mongo/aggregate")]
+        public async Task<IEnumerable<BenchmarkResult>> MongoAggregate()
+        {
+            _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
+            return await _mongoBenchmarkService.StartAggregateBenchmarkAsync();
+        }
+
+
         [HttpGet("sql/neighbour")]
         public async Task<IEnumerable<BenchmarkResult>> SqlNeighbour()
         {
@@ -57,6 +67,14 @@ namespace BenchmarkApp.Server.Controllers
             return await _sqlBenchmarkService.StartUserBenchmarkAsync();
         }
 
+        [HttpGet("sql/aggregate")]
+        public async Task<IEnumerable<BenchmarkResult>> SqlAggregate()
+        {
+            _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
+            return await _sqlBenchmarkService.StartAggregateBenchmarkAsync();
+        }
+
+
         [HttpGet("neo4j/neighbour")]
         public async Task<IEnumerable<BenchmarkResult>> Neo4JNeighbour()
         {
@@ -69,6 +87,13 @@ namespace BenchmarkApp.Server.Controllers
         {
             _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
             return await _neo4JBenchmarkService.StartUserBenchmarkAsync();
+        }
+
+        [HttpGet("neo4j/aggregate")]
+        public async Task<IEnumerable<BenchmarkResult>> Neo4Aggregate()
+        {
+            _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
+            return await _neo4JBenchmarkService.StartAggregateBenchmarkAsync();
         }
     }
 }

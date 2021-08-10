@@ -49,6 +49,30 @@
         <h4>Neighbour Benchmark Results</h4>
         <Table Results="_neighbourResults"></Table>
     }
+    
+    
+     <div style="height: 20px"> </div>
+    
+        <div class="margin">
+            <button class="btn btn-primary" @onclick="(async () => await StartAggregateBenchmark())">Start Agreggate Benchmark</button>
+    
+            @if (!_isAggregateLoading)
+            {
+                <span> Loading aggregated value of users (for example age distribution)  </span>
+            }
+            @if (_isAggregateLoading)
+            {
+                <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+            }
+        </div>
+    
+        <div style="height: 15px"> </div>
+    
+        @if (_aggregateResults != null)
+        {
+            <h4>Aggregate Benchmark Results</h4>
+            <Table Results="_aggregateResults"></Table>
+        }
 
 </div>
 
@@ -62,9 +86,11 @@
 
     private IEnumerable<BenchmarkResult> _neighbourResults;
     private IEnumerable<BenchmarkResult> _userResults;
+    private IEnumerable<BenchmarkResult> _aggregateResults;
 
     private bool _isNeighbourLoading;
     private bool _isUserLoading;
+    private bool _isAggregateLoading;
 
     private async Task StartNeighbourBenchmark()
     {
@@ -78,6 +104,13 @@
         _isUserLoading = true;
         _userResults = await CallApi($"benchmark/{BaseUrl}/user");
         _isUserLoading = false;
+    }
+    
+    private async Task StartAggregateBenchmark()
+    {
+        _isAggregateLoading = true;
+        _aggregateResults = await CallApi($"benchmark/{BaseUrl}/aggregate");
+        _isAggregateLoading = false;
     }
 
     private async Task<IEnumerable<BenchmarkResult>> CallApi(string url)

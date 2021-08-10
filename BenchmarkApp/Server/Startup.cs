@@ -55,9 +55,9 @@ namespace BenchmarkApp.Server
             services.AddTransient<IDataLoader<Neo4JRepository>, Neo4JRepository>();
             services.AddTransient<IDataLoader<SqlRepository>, SqlRepository>();
 
-            services.AddTransient<IBenchmarkService<MongoBenchmarkService>, MongoBenchmarkService>();
-            services.AddTransient<IBenchmarkService<Neo4JBenchmarkService>, Neo4JBenchmarkService>();
-            services.AddTransient<IBenchmarkService<SqlBenchmarkService>, SqlBenchmarkService>();
+            services.AddTransient<BenchmarkService<MongoRepository>, MongoBenchmarkService>();
+            services.AddTransient<BenchmarkService<Neo4JRepository>, Neo4JBenchmarkService>();
+            services.AddTransient<BenchmarkService<SqlRepository>, SqlBenchmarkService>();
 
             services.AddTransient<TimerService>();
             services.AddTransient<FakeDataGeneratorService>();

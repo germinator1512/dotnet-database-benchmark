@@ -12,16 +12,10 @@ namespace BenchmarkApp.Server.Database.Core
         /// <summary>
         /// executes the given function with 0 .. Config.NestedUsers as parameters
         /// </summary>
-        /// <param name="loader">repository to connect to</param>
         /// <param name="benchmarkFunction">function to execute </param>
-        /// <typeparam name="T"></typeparam>
         /// <returns>List of Benchmark-results of given function</returns>
-        public static async Task<IEnumerable<BenchmarkResult>> BenchmarkAsync<T>(
-            IDataLoader<T> loader,
-            Func<int, Task<int>> benchmarkFunction)
+        public static async Task<IEnumerable<BenchmarkResult>> BenchmarkAsync(Func<int, Task<int>> benchmarkFunction)
         {
-            await loader.ConnectAsync();
-
             var results = new List<BenchmarkResult>();
             foreach (var level in Enumerable.Range(0, Config.NestedUserLevels))
             {

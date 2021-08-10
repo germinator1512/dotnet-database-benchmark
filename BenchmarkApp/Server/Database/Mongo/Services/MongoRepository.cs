@@ -30,6 +30,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return users.Count;
         }
 
+        public Task<int> LoadAggregateAsync(int level)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task ConnectAsync() => await IsDatabaseEmptyAsync();
 
         private async Task LoadFriendsRecursively(
