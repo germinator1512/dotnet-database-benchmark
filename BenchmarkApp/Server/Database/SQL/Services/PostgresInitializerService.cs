@@ -12,11 +12,15 @@ namespace BenchmarkApp.Server.Database.SQL.Services
     {
         private readonly SqlDatabaseContext _context;
         private readonly IDataLoader<SqlRepository> _repository;
+        private readonly FakeDataGeneratorService _faker;
 
-        public PostgresInitializerService(SqlDatabaseContext context, IDataLoader<SqlRepository> repository)
+        public PostgresInitializerService(SqlDatabaseContext context,
+            IDataLoader<SqlRepository> repository,
+            FakeDataGeneratorService faker)
         {
             _context = context;
             _repository = repository;
+            _faker = faker;
         }
 
         public async Task<InsertResult> InsertUserDataSetAsync()
@@ -51,10 +55,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         {
             Console.WriteLine("No entities found in PostgresDb - Inserting Test Dataset");
 
-            var firstUser = new SqlUserEntity
-            {
-                Name = Config.RootUserName
-            };
+            var firstUser = _faker.GenerateFakeUser<SqlUserEntity>(Config.RootUserName);
 
             await _context.Users.AddAsync(firstUser);
 
@@ -71,7 +72,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         /// <param name="howMany">number of new entities to be added to friends list of root user</param>
         /// <param name="nestedLevels">how many levels deep entities should be nested e.g 6 adds 10^6 users</param>
         /// <param name="currentLevel">current level of function call</param>
-        private static async Task AddFriendRecursiveAsync(
+        private async Task AddFriendRecursiveAsync(
             SqlUserEntity root,
             int howMany,
             int nestedLevels,
@@ -85,7 +86,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         }
 
 
-        private static List<SqlFriendshipEntity> GenerateFriendsWithFriendShips(
+        private List<SqlFriendshipEntity> GenerateFriendsWithFriendShips(
             SqlUserEntity rootFriend,
             int howMany,
             int level)
@@ -96,10 +97,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                 {
                     FriendA = rootFriend,
                     FriendAId = rootFriend.Id,
-                    FriendB = new SqlUserEntity
-                    {
-                        Name = Config.UserName(level, z),
-                    },
+                    FriendB = _faker.GenerateFakeUser<SqlUserEntity>(Config.UserName(level, z))
                 }).ToList();
         }
     }

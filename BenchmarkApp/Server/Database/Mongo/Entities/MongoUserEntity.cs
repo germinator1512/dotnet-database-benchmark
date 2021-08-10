@@ -1,21 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Mongo.Services;
+using Bogus.DataSets;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Entities
 {
-    public class MongoUserEntity
+    public class MongoUserEntity: IBaseUser
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
 
-        public string Name { get; init; }
+        public string Identifier { get; set; }
 
+        
+        // Fake User Data
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime Birthday { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public Name.Gender Gender { get; set; }
+        
+        
         [BsonIgnore] public List<MongoUserEntity> Friends { get; private set; } = new();
 
         public List<MongoDBRef> FriendIds { get; set; } = new();

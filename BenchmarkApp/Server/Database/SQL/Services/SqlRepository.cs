@@ -32,7 +32,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public async Task<int> LoadNestedEntitiesAsync(int level)
         {
-            var firstUser = await _ctx.Users.SingleAsync(u => u.Name.Equals(Config.RootUserName));
+            var firstUser = await _ctx.Users.SingleAsync(u => u.Identifier.Equals(Config.RootUserName));
 
             var all = await _ctx.Friendships
                 .Where(f => f.FriendA.Id == firstUser.Id)

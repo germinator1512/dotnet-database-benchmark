@@ -17,6 +17,7 @@
     @if (_result is {Success: false })
     {
         <span style="margin-left: 15px">An Error occured while filling @DatabaseName Database, please try again</span>
+        <span style="margin-left: 15px"> @_result.ErrorMessage</span>
     }
 </div>
 
@@ -38,3 +39,4 @@
     }
 
 }
+

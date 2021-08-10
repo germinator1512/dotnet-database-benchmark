@@ -13,11 +13,15 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     {
         private readonly IDataLoader<Neo4JRepository> _repository;
         private readonly IGraphClient _client;
+        private readonly FakeDataGeneratorService _faker;
 
-        public Neo4JInitializerService(IDataLoader<Neo4JRepository> neo4JRepository, IGraphClient client)
+        public Neo4JInitializerService(IDataLoader<Neo4JRepository> neo4JRepository,
+            IGraphClient client,
+            FakeDataGeneratorService faker)
         {
             _repository = neo4JRepository;
             _client = client;
+            _faker = faker;
         }
 
         public async Task<InsertResult> InsertUserDataSetAsync()
@@ -50,11 +54,9 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             Console.WriteLine("No entities found in Neo4J - Inserting Test Dataset");
 
             const string firstName = Config.RootUserName;
-            var firstUser = new Neo4JUserEntity
-            {
-                Name = firstName,
-                Id = Guid.NewGuid().ToString()
-            };
+
+            var firstUser = _faker.GenerateFakeUser<Neo4JUserEntity>(Config.RootUserName);
+            firstUser.Id = Guid.NewGuid().ToString();
 
             await InsertSingleUserAsync(firstUser);
 
@@ -82,15 +84,16 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                     await AddFriendRecursiveAsync(friend, Config.FriendsPerUser, nestedLevels, currentLevel + 1);
         }
 
-        private static IEnumerable<Neo4JUserEntity> GenerateFriends(
+        private IEnumerable<Neo4JUserEntity> GenerateFriends(
             int howMany,
             int level)
             => Enumerable
                 .Range(1, howMany)
-                .Select(z => new Neo4JUserEntity
+                .Select(z =>
                 {
-                    Name = Config.UserName(level, z),
-                    Id = Guid.NewGuid().ToString()
+                    var user = _faker.GenerateFakeUser<Neo4JUserEntity>(Config.UserName(level, z));
+                    user.Id = Guid.NewGuid().ToString();
+                    return user;
                 }).ToList();
 
         private async Task InsertSingleUserAsync(Neo4JUserEntity single)

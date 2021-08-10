@@ -15,7 +15,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         public async Task<int> LoadNestedEntitiesAsync(int level)
         {
             var user = await _ctx.Users
-                .Find(u => u.Name == Config.RootUserName)
+                .Find(u => u.Identifier == Config.RootUserName)
                 .SingleAsync();
 
             await LoadFriendsRecursively(user, level);

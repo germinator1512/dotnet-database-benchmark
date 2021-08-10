@@ -60,6 +60,7 @@ namespace BenchmarkApp.Server
             services.AddTransient<IBenchmarkService<SqlBenchmarkService>, SqlBenchmarkService>();
 
             services.AddTransient<TimerService>();
+            services.AddTransient<FakeDataGeneratorService>();
 
             // database initialization
             services.AddTransient<PostgresInitializerService>();

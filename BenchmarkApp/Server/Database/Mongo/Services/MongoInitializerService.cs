@@ -13,11 +13,15 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
     {
         private readonly IDataLoader<MongoRepository> _mongoRepository;
         private readonly MongoDatabaseContext _context;
+        private readonly FakeDataGeneratorService _faker;
 
-        public MongoInitializerService(IDataLoader<MongoRepository> repository, MongoDatabaseContext context)
+        public MongoInitializerService(IDataLoader<MongoRepository> repository,
+            MongoDatabaseContext context,
+            FakeDataGeneratorService faker)
         {
             _mongoRepository = repository;
             _context = context;
+            _faker = faker;
         }
 
         public async Task<InsertResult> InsertUserDataSetAsync()
@@ -49,10 +53,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             Console.WriteLine("No entities found in MongoDB - Inserting Test Dataset");
 
-            var firstUser = new MongoUserEntity
-            {
-                Name = Config.RootUserName,
-            };
+            var firstUser = _faker.GenerateFakeUser<MongoUserEntity>(Config.RootUserName);
 
             await AddFriendRecursiveAsync(firstUser, Config.FriendsPerUser - 1, Config.NestedUserLevels);
             await _context.Users.InsertOneAsync(firstUser);
@@ -73,7 +74,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             List<MongoUserEntity> GenerateFriends() => Enumerable
                 .Range(1, howMany)
-                .Select(z => new MongoUserEntity {Name = Config.UserName(currentLevel, z),})
+                .Select(z => _faker.GenerateFakeUser<MongoUserEntity>(Config.UserName(currentLevel, z)))
                 .ToList();
 
             var friends = GenerateFriends();
