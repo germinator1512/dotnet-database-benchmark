@@ -12,7 +12,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         private readonly MongoDatabaseContext _ctx;
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<int> LoadNestedEntitiesAsync(int level)
+        public async Task<int> LoadNestedEntitiesAsync(int level)a
         {
             var user = await _ctx.Users
                 .Find(u => u.Identifier == Config.RootUserName)
@@ -35,6 +35,8 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
             var agg = _ctx.Users.AsQueryable()
+                .OrderBy(u => u.Id)
+                .Take(howMany)
                 .GroupBy(x => true)
                 .Select(g => g.Average(s => s.Age))
                 .Take(1);

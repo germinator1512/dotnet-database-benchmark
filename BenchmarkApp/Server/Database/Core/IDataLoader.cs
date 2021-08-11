@@ -3,7 +3,7 @@
 namespace BenchmarkApp.Server.Database.Core
 {
     /// <summary>
-    /// generic interface for simple extension of benchmark appplication
+    /// generic interface for simple extension of benchmark application
     /// </summary>
     /// <typeparam name="T">Database Repository to load data from</typeparam>
     public interface IDataLoader<T>

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using Neo4jClient;
-using Neo4jClient.Cypher;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
@@ -17,17 +16,13 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
-            var result =await  _client.Cypher
-                .Match("(user:User)")
+            var result = (await _client.Cypher
+                .Match("(n:User)")
+                .Return<double>("n.age")
                 .Limit(howMany)
-                .Return(n => new
-                {
-                    Avg = Return.As<double>("avg(user.age)")
-                })
-                .Limit(1)
-                .ResultsAsync;
+                .ResultsAsync)
+                .Average();
 
-            var avg = result.ToList()[0].Avg;
             return howMany;
         }
 
