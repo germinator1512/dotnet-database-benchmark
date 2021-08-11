@@ -12,7 +12,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         private readonly MongoDatabaseContext _ctx;
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
 
-        public async Task<int> LoadNestedEntitiesAsync(int level)a
+        public async Task<int> LoadNestedEntitiesAsync(int level)
         {
             var user = await _ctx.Users
                 .Find(u => u.Identifier == Config.RootUserName)
