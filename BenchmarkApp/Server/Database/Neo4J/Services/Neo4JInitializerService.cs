@@ -20,7 +20,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                                           + "identifier : $identifier,"
                                           + "firstName : $firstName,"
                                           + "lastName : $lastName,"
-                                          + "birthday : $birthday,"
+                                          + "age : $age,"
                                           + "email : $email,"
                                           + "userName : $userName,"
                                           + "gender : $gender})";
@@ -30,7 +30,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                                                      "id: friend.id," +
                                                      "firstName:friend.firstName," +
                                                      "lastName:friend.lastName," +
-                                                     "birthday: friend.birthday," +
+                                                     "age: friend.age," +
                                                      "email:friend.email," +
                                                      "userName:friend.userName," +
                                                      "gender:friend.gender}" +

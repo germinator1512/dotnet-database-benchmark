@@ -14,7 +14,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Entities
         // Fake User Data
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime Birthday { get; set; }
+        public int Age { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
         public Name.Gender Gender { get; set; }
@@ -25,7 +25,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Entities
             identifier = Identifier,
             firstName = FirstName,
             lastName = LastName,
-            birthday = Birthday,
+            age = Age,
             email = Email,
             userName = UserName,
             gender = Gender

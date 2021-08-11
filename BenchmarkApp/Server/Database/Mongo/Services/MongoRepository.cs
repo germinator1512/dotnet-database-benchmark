@@ -30,9 +30,17 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return users.Count;
         }
 
-        public Task<int> LoadAggregateAsync(int level)
+        public async Task<int> LoadAggregateAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var agg = _ctx.Users.AsQueryable()
+                .GroupBy(x => true)
+                .Select(g => g.Average(s => s.Age))
+                .Take(1);
+
+            var average = agg.ToList()[0];
+            return howMany;
         }
 
         public async Task ConnectAsync() => await IsDatabaseEmptyAsync();

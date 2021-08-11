@@ -20,9 +20,11 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             return asyncUsers.Count;
         }
 
-        public Task<int> LoadAggregateAsync(int level)
+        public async Task<int> LoadAggregateAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+            var avg = _ctx.Users.Take(howMany).Average(t => t.Age);
+            return howMany;
         }
 
         public async Task ConnectAsync() => await LoadEntitiesAsync(1);

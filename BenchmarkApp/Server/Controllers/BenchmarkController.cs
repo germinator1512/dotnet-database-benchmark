@@ -22,8 +22,7 @@ namespace BenchmarkApp.Server.Controllers
         public BenchmarkController(ILogger<BenchmarkController> logger,
             BenchmarkService<MongoRepository> mongoBenchmarkService,
             BenchmarkService<SqlRepository> sqlBenchmarkService,
-            BenchmarkService<Neo4JRepository> neo4JBenchmarkService
-        )
+            BenchmarkService<Neo4JRepository> neo4JBenchmarkService)
         {
             _logger = logger;
             _mongoBenchmarkService = mongoBenchmarkService;

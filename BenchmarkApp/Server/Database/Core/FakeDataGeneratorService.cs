@@ -18,8 +18,7 @@ namespace BenchmarkApp.Server.Database.Core
                 .RuleFor(u => u.LastName, (f, u) => f.Name.LastName(u.Gender))
                 .RuleFor(u => u.UserName, (f, u) => f.Internet.UserName(u.FirstName, u.LastName))
                 .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
-                .RuleFor(u => u.Birthday,
-                    (f, _) => f.Date.Between(DateTime.Now.AddYears(-65), DateTime.Now.AddYears(-18)))
+                .RuleFor(u => u.Age, (f, u) => f.Random.Number(18, 100))
                 .Generate();
 
 

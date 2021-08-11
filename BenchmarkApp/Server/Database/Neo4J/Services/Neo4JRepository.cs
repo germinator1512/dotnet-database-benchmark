@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Entities;
 using Neo4jClient;
+using Neo4jClient.Cypher;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
@@ -12,9 +13,22 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         private readonly IGraphClient _client;
         public Neo4JRepository(IGraphClient client) => _client = client;
 
-        public Task<int> LoadAggregateAsync(int level)
+        public async Task<int> LoadAggregateAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var result =await  _client.Cypher
+                .Match("(user:User)")
+                .Limit(howMany)
+                .Return(n => new
+                {
+                    Avg = Return.As<double>("avg(user.age)")
+                })
+                .Limit(1)
+                .ResultsAsync;
+
+            var avg = result.ToList()[0].Avg;
+            return howMany;
         }
 
         public async Task ConnectAsync()

@@ -23,7 +23,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Entities
         // Fake User Data
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime Birthday { get; set; }
+        public int Age { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
         public Name.Gender Gender { get; set; }

@@ -11,7 +11,7 @@ namespace BenchmarkApp.Server.Database.Core
 
         public string LastName { get; }
 
-        public DateTime Birthday { get; }
+        public int Age { get; }
 
         public string Email { get; }
 
