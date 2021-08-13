@@ -9,7 +9,7 @@ namespace BenchmarkApp.Server.Controllers
     [Route("benchmark/mongo")]
     public class MongoBenchmarkController : BenchmarkController<MongoRepository>
     {
-        protected MongoBenchmarkController(BenchmarkService<MongoRepository> service, ILogger<MongoRepository> logger) :
+        public MongoBenchmarkController(BenchmarkService<MongoRepository> service, ILogger<MongoRepository> logger) :
             base(service, logger)
         {
         }
