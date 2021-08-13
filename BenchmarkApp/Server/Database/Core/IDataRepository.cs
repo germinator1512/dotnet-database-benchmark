@@ -6,7 +6,7 @@ namespace BenchmarkApp.Server.Database.Core
     /// generic interface for simple extension of benchmark application
     /// </summary>
     /// <typeparam name="T">Database Repository to load data from</typeparam>
-    public interface IDataRepository<T>
+    public interface IDataRepository<T> where T : class
     {
         // read functions
         

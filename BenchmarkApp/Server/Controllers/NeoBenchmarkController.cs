@@ -7,9 +7,10 @@ namespace BenchmarkApp.Server.Controllers
 {
     [ApiController]
     [Route("benchmark/neo4j")]
-    public class NeoBenchmarkController :BenchmarkController<Neo4JRepository>
+    public class NeoBenchmarkController : BenchmarkController<Neo4JRepository>
     {
-        public NeoBenchmarkController(BenchmarkService<Neo4JRepository> service, ILogger<Neo4JRepository> logger) : base(service, logger)
+        public NeoBenchmarkController(BenchmarkService<Neo4JRepository> service,
+            ILogger<Neo4JRepository> logger) : base(service, logger)
         {
         }
     }

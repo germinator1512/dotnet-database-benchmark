@@ -5,7 +5,7 @@ using BenchmarkApp.Shared;
 
 namespace BenchmarkApp.Server.Services.Interfaces
 {
-    public abstract class BenchmarkService<T>
+    public class BenchmarkService<T> where T : class, IDataRepository<T>
     {
         protected BenchmarkService(IDataRepository<T> repository) => _repository = repository;
 

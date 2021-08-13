@@ -1,5 +1,4 @@
 using System;
-using BenchmarkApp.Server.Database;
 using BenchmarkApp.Server.Database.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -51,14 +50,16 @@ namespace BenchmarkApp.Server
             services.AddSingleton<IGraphClient>(neo4JClient);
             services.AddTransient<MongoDatabaseContext>();
 
+
             services.AddTransient<IDataRepository<MongoRepository>, MongoRepository>();
             services.AddTransient<IDataRepository<Neo4JRepository>, Neo4JRepository>();
             services.AddTransient<IDataRepository<SqlRepository>, SqlRepository>();
-
+            
             services.AddTransient<BenchmarkService<MongoRepository>, MongoBenchmarkService>();
             services.AddTransient<BenchmarkService<Neo4JRepository>, Neo4JBenchmarkService>();
             services.AddTransient<BenchmarkService<SqlRepository>, SqlBenchmarkService>();
-
+            
+            
             services.AddTransient<TimerService>();
             services.AddTransient<FakeDataGeneratorService>();
 
