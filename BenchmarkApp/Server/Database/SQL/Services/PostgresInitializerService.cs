@@ -12,11 +12,11 @@ namespace BenchmarkApp.Server.Database.SQL.Services
     public class PostgresInitializerService
     {
         private readonly SqlDatabaseContext _context;
-        private readonly IDataLoader<SqlRepository> _repository;
+        private readonly IDataRepository<SqlRepository> _repository;
         private readonly FakeDataGeneratorService _faker;
 
         public PostgresInitializerService(SqlDatabaseContext context,
-            IDataLoader<SqlRepository> repository,
+            IDataRepository<SqlRepository> repository,
             FakeDataGeneratorService faker)
         {
             _context = context;

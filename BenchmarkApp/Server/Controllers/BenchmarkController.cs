@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BenchmarkApp.Server.Database.Mongo.Services;
-using BenchmarkApp.Server.Database.Neo4J.Services;
-using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services.Interfaces;
 using BenchmarkApp.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -11,88 +8,51 @@ using Microsoft.Extensions.Logging;
 namespace BenchmarkApp.Server.Controllers
 {
     [ApiController]
-    [Route("benchmark")]
-    public class BenchmarkController : ControllerBase
+    public class BenchmarkController<T>
     {
-        private readonly ILogger<BenchmarkController> _logger;
-        private readonly BenchmarkService<MongoRepository> _mongoBenchmarkService;
-        private readonly BenchmarkService<SqlRepository> _sqlBenchmarkService;
-        private readonly BenchmarkService<Neo4JRepository> _neo4JBenchmarkService;
+        private readonly BenchmarkService<T> _benchmarkService;
+        private readonly ILogger<T> _logger;
 
-        public BenchmarkController(ILogger<BenchmarkController> logger,
-            BenchmarkService<MongoRepository> mongoBenchmarkService,
-            BenchmarkService<SqlRepository> sqlBenchmarkService,
-            BenchmarkService<Neo4JRepository> neo4JBenchmarkService)
+        protected BenchmarkController(BenchmarkService<T> service, ILogger<T> logger)
         {
+            _benchmarkService = service;
             _logger = logger;
-            _mongoBenchmarkService = mongoBenchmarkService;
-            _sqlBenchmarkService = sqlBenchmarkService;
-            _neo4JBenchmarkService = neo4JBenchmarkService;
-        }
-
-        [HttpGet("mongo/neighbour")]
-        public async Task<IEnumerable<BenchmarkResult>> MongoNeighbour()
-        {
-            _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
-            return await _mongoBenchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
-        }
-
-        [HttpGet("mongo/user")]
-        public async Task<IEnumerable<BenchmarkResult>> MongoUser()
-        {
-            _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
-            return await _mongoBenchmarkService.StartUserBenchmarkAsync();
-        }
-
-        [HttpGet("mongo/aggregate")]
-        public async Task<IEnumerable<BenchmarkResult>> MongoAggregate()
-        {
-            _logger.Log(LogLevel.Debug, "Starting Mongo Benchmark");
-            return await _mongoBenchmarkService.StartAggregateBenchmarkAsync();
         }
 
 
-        [HttpGet("sql/neighbour")]
-        public async Task<IEnumerable<BenchmarkResult>> SqlNeighbour()
+        [HttpGet("neighbour")]
+        public async Task<IEnumerable<BenchmarkResult>> Neighbour()
         {
-            _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
-            return await _sqlBenchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
+            _logger.Log(LogLevel.Debug, "Starting Neighbour Benchmark");
+            return await _benchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
         }
 
-        [HttpGet("sql/user")]
-        public async Task<IEnumerable<BenchmarkResult>> SqlUser()
+        [HttpGet("user")]
+        public async Task<IEnumerable<BenchmarkResult>> User()
         {
-            _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
-            return await _sqlBenchmarkService.StartUserBenchmarkAsync();
+            _logger.Log(LogLevel.Debug, "Starting User Benchmark");
+            return await _benchmarkService.StartUserBenchmarkAsync();
         }
 
-        [HttpGet("sql/aggregate")]
-        public async Task<IEnumerable<BenchmarkResult>> SqlAggregate()
+        [HttpGet("aggregate")]
+        public async Task<IEnumerable<BenchmarkResult>> Aggregate()
         {
-            _logger.Log(LogLevel.Debug, "Starting SQL Benchmark");
-            return await _sqlBenchmarkService.StartAggregateBenchmarkAsync();
+            _logger.Log(LogLevel.Debug, "Starting Aggregate Benchmark");
+            return await _benchmarkService.StartAggregateBenchmarkAsync();
         }
 
-
-        [HttpGet("neo4j/neighbour")]
-        public async Task<IEnumerable<BenchmarkResult>> Neo4JNeighbour()
+        [HttpGet("writeNested")]
+        public async Task<IEnumerable<BenchmarkResult>> WriteNested()
         {
-            _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
-            return await _neo4JBenchmarkService.StartFriendsWithNeighboursBenchmarkAsync();
+            _logger.Log(LogLevel.Debug, "Starting WriteNested Benchmark");
+            return await _benchmarkService.StartNestedWriteBenchmarkAsync();
         }
 
-        [HttpGet("neo4j/user")]
-        public async Task<IEnumerable<BenchmarkResult>> Neo4JUser()
+        [HttpGet("write")]
+        public async Task<IEnumerable<BenchmarkResult>> Write()
         {
-            _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
-            return await _neo4JBenchmarkService.StartUserBenchmarkAsync();
-        }
-
-        [HttpGet("neo4j/aggregate")]
-        public async Task<IEnumerable<BenchmarkResult>> Neo4Aggregate()
-        {
-            _logger.Log(LogLevel.Debug, "Starting Neo4J Benchmark");
-            return await _neo4JBenchmarkService.StartAggregateBenchmarkAsync();
+            _logger.Log(LogLevel.Debug, "Starting Write Benchmark");
+            return await _benchmarkService.StartWriteBenchmarkAsync();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace BenchmarkApp.Server.Services
 {
     public class Neo4JBenchmarkService : BenchmarkService<Neo4JRepository>
     {
-        public Neo4JBenchmarkService(IDataLoader<Neo4JRepository> loader) : base(loader)
+        public Neo4JBenchmarkService(IDataRepository<Neo4JRepository> repository) : base(repository)
         {
         }
     }

@@ -6,7 +6,7 @@ namespace BenchmarkApp.Server.Services
 {
     public class MongoBenchmarkService : BenchmarkService<MongoRepository>
     {
-        public MongoBenchmarkService(IDataLoader<MongoRepository> loader) : base(loader)
+        public MongoBenchmarkService(IDataRepository<MongoRepository> repository) : base(repository)
         {
         }
     }

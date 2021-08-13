@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BenchmarkApp.Server.Database.SQL.Services
 {
-    public class SqlRepository : IDataLoader<SqlRepository>
+    public class SqlRepository : IDataRepository<SqlRepository>
     {
         private readonly SqlDatabaseContext _ctx;
 
@@ -25,6 +25,16 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
             var avg = _ctx.Users.Take(howMany).Average(t => t.Age);
             return howMany;
+        }
+
+        public Task<int> WriteEntitiesAsync(int level)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> WriteNestedEntitiesAsync(int level)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task ConnectAsync() => await LoadEntitiesAsync(1);

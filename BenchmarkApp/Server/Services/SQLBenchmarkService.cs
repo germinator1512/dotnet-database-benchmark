@@ -6,7 +6,7 @@ namespace BenchmarkApp.Server.Services
 {
     public class SqlBenchmarkService : BenchmarkService<SqlRepository>
     {
-        public SqlBenchmarkService(IDataLoader<SqlRepository> loader) : base(loader)
+        public SqlBenchmarkService(IDataRepository<SqlRepository> repository) : base(repository)
         {
         }
     }

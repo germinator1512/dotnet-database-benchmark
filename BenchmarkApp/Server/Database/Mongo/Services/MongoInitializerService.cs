@@ -11,11 +11,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 {
     public class MongoInitializerService
     {
-        private readonly IDataLoader<MongoRepository> _mongoRepository;
+        private readonly IDataRepository<MongoRepository> _mongoRepository;
         private readonly MongoDatabaseContext _context;
         private readonly FakeDataGeneratorService _faker;
 
-        public MongoInitializerService(IDataLoader<MongoRepository> repository,
+        public MongoInitializerService(IDataRepository<MongoRepository> repository,
             MongoDatabaseContext context,
             FakeDataGeneratorService faker)
         {

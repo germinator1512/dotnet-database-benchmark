@@ -6,29 +6,54 @@ namespace BenchmarkApp.Server.Database.Core
     /// generic interface for simple extension of benchmark application
     /// </summary>
     /// <typeparam name="T">Database Repository to load data from</typeparam>
-    public interface IDataLoader<T>
+    public interface IDataRepository<T>
     {
+        // read functions
+        
         /// <summary>
-        /// loads 10 users with 10 ^ (level+1) nested users from database
+        /// loads 10 users with 10 ^ (level+1) nested users from database // neighbors second test
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
         Task<int> LoadNestedEntitiesAsync(int level);
 
         /// <summary>
-        /// loads 10 ^ (level + 1) users from database
+        /// loads 10 ^ (level + 1) users from database // single-read test
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
         Task<int> LoadEntitiesAsync(int level);
         
         /// <summary>
-        /// loads aggregated value of 10 ^ (level + 1) users from database
+        /// loads aggregated value of 10 ^ (level + 1) users from database  // aggregation test
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of loaded entities</returns>
         Task<int> LoadAggregateAsync(int level);
        
+        
+        
+        // write functions
+        
+        /// <summary>
+        /// writes 10 ^ (level + 1) users to database
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns>total number of written entities</returns>
+        Task<int> WriteEntitiesAsync(int level);
+
+
+        /// <summary>
+        /// writes 10 ^ (level + 1) nested users to database
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns>total number of written entities</returns>
+        Task<int> WriteNestedEntitiesAsync(int level);
+        
+        
+        
+        // Helper functions
+        
         /// <summary>
         /// connects to database to avoid "cold start" issues
         /// </summary>

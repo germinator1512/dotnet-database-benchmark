@@ -7,7 +7,7 @@ using MongoDB.Driver;
 
 namespace BenchmarkApp.Server.Database.Mongo.Services
 {
-    public class MongoRepository : IDataLoader<MongoRepository>
+    public class MongoRepository : IDataRepository<MongoRepository>
     {
         private readonly MongoDatabaseContext _ctx;
         public MongoRepository(MongoDatabaseContext context) => _ctx = context;
@@ -43,6 +43,16 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
 
             var average = agg.ToList()[0];
             return howMany;
+        }
+
+        public Task<int> WriteEntitiesAsync(int level)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> WriteNestedEntitiesAsync(int level)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task ConnectAsync() => await IsDatabaseEmptyAsync();

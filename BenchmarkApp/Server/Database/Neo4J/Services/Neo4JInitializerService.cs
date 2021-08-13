@@ -11,7 +11,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
     public class Neo4JInitializerService
     {
-        private readonly IDataLoader<Neo4JRepository> _repository;
+        private readonly IDataRepository<Neo4JRepository> _repository;
         private readonly IGraphClient _client;
         private readonly FakeDataGeneratorService _faker;
 
@@ -36,7 +36,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                                                      "gender:friend.gender}" +
                                                      ") <-[:KNOWS]-(root)";
 
-        public Neo4JInitializerService(IDataLoader<Neo4JRepository> neo4JRepository,
+        public Neo4JInitializerService(IDataRepository<Neo4JRepository> neo4JRepository,
             IGraphClient client,
             FakeDataGeneratorService faker)
         {

@@ -12,12 +12,12 @@ namespace BenchmarkApp.Server.Controllers
     [Route("database")]
     public class DatabaseController : ControllerBase
     {
-        private readonly ILogger<BenchmarkController> _logger;
+        private readonly ILogger<DatabaseController> _logger;
         private readonly Neo4JInitializerService _neo4JInitializerService;
         private readonly MongoInitializerService _mongoInitializerService;
         private readonly PostgresInitializerService _postgresService;
 
-        public DatabaseController(ILogger<BenchmarkController> logger,
+        public DatabaseController(ILogger<DatabaseController> logger,
             PostgresInitializerService postgresService,
             Neo4JInitializerService neo4JInitializerService,
             MongoInitializerService mongoInitializerService)

@@ -7,7 +7,7 @@ using Neo4jClient;
 
 namespace BenchmarkApp.Server.Database.Neo4J.Services
 {
-    public class Neo4JRepository : IDataLoader<Neo4JRepository>
+    public class Neo4JRepository : IDataRepository<Neo4JRepository>
     {
         private readonly IGraphClient _client;
         public Neo4JRepository(IGraphClient client) => _client = client;
@@ -24,6 +24,16 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Average();
 
             return howMany;
+        }
+
+        public Task<int> WriteEntitiesAsync(int level)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> WriteNestedEntitiesAsync(int level)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task ConnectAsync()

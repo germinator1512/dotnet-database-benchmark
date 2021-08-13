@@ -51,9 +51,9 @@ namespace BenchmarkApp.Server
             services.AddSingleton<IGraphClient>(neo4JClient);
             services.AddTransient<MongoDatabaseContext>();
 
-            services.AddTransient<IDataLoader<MongoRepository>, MongoRepository>();
-            services.AddTransient<IDataLoader<Neo4JRepository>, Neo4JRepository>();
-            services.AddTransient<IDataLoader<SqlRepository>, SqlRepository>();
+            services.AddTransient<IDataRepository<MongoRepository>, MongoRepository>();
+            services.AddTransient<IDataRepository<Neo4JRepository>, Neo4JRepository>();
+            services.AddTransient<IDataRepository<SqlRepository>, SqlRepository>();
 
             services.AddTransient<BenchmarkService<MongoRepository>, MongoBenchmarkService>();
             services.AddTransient<BenchmarkService<Neo4JRepository>, Neo4JBenchmarkService>();
