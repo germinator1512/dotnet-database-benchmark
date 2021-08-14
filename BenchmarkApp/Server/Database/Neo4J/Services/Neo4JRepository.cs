@@ -101,10 +101,11 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         }
 
 
-        public Task EmptyWriteDatabaseAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task EmptyWriteDatabaseAsync()
+            => await _client.Cypher
+                .Match("(n:WriteUser)")
+                .DetachDelete("n")
+                .ExecuteWithoutResultsAsync();
 
         public async Task<bool> IsReadDatabaseEmptyAsync()
             => (await _client.Cypher
@@ -117,7 +118,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
 
         public async Task EmptyReadDatabaseAsync()
             => await _client.Cypher
-                .Match("(n)")
+                .Match("(n:User)")
                 .DetachDelete("n")
                 .ExecuteWithoutResultsAsync();
     }
