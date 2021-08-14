@@ -5,10 +5,10 @@
 
 <div class="margin">
 
-    <div style="height: 20px"> </div>
-
+    <div style="height: 15px"> </div>
 
     <SingleResult Description="Loading n random users from Database" Title="User" Url="/user" BaseUrl="@BaseUrl"></SingleResult>
+
     <div style="height: 15px"> </div>
 
 
@@ -22,6 +22,7 @@
     <SingleResult Description="Loading aggregated value of users (for example age distribution)" Title="Aggregate"
                   Url="/aggregate" BaseUrl="@BaseUrl">
     </SingleResult>
+
     <div style="height: 15px"> </div>
 
 
@@ -29,8 +30,12 @@
                   Url="/write" BaseUrl="@BaseUrl">
     </SingleResult>
 
-
     <div style="height: 15px"> </div>
+
+
+    <SingleResult Description="Writing n randomly generated users nested n levels deep to database" Title="Write Nested"
+                  Url="/writeNested" BaseUrl="@BaseUrl">
+    </SingleResult>
 
 </div>
 

@@ -21,7 +21,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         public async Task<int> LoadEntitiesAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
-            
+
             var users = await _ctx.Users
                 .Take(howMany)
                 .OrderBy(u => u.Id)
@@ -33,6 +33,7 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         public async Task<int> LoadAggregateAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
             var avg = _ctx.Users
                 .Take(howMany)
                 .OrderBy(u => u.Id)
