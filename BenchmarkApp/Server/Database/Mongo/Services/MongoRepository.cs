@@ -10,7 +10,13 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
     public class MongoRepository : IDataRepository<MongoRepository>
     {
         private readonly MongoDatabaseContext _ctx;
-        public MongoRepository(MongoDatabaseContext context) => _ctx = context;
+        private readonly FakeDataGeneratorService _faker;
+
+        public MongoRepository(MongoDatabaseContext context, FakeDataGeneratorService faker)
+        {
+            _ctx = context;
+            _faker = faker;
+        }
 
         public async Task<int> LoadNestedEntitiesAsync(int level)
         {
@@ -45,9 +51,18 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return howMany;
         }
 
-        public Task<int> WriteEntitiesAsync(int level)
+        public async Task<int> WriteEntitiesAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var friends = Enumerable
+                .Range(1, howMany)
+                .Select(z => _faker.GenerateFakeUser<MongoUserEntity>(Config.UserName(level, z)))
+                .ToList();
+
+            await _ctx.WriteUsers.InsertManyAsync(friends);
+
+            return howMany;
         }
 
         public Task<int> WriteNestedEntitiesAsync(int level)
@@ -69,11 +84,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                     await LoadFriendsRecursively(friend, nestedLevels, currentLevel + 1);
         }
 
-        public Task EmptyWriteDatabaseAsync()
-        {
-            throw new NotImplementedException();
-        }
-
+        public async Task EmptyWriteDatabaseAsync() => await _ctx.WriteUsers.DeleteManyAsync(u => true);
         public async Task<bool> IsReadDatabaseEmptyAsync() => !(await _ctx.Users.Find(_ => true).ToListAsync()).Any();
 
         public async Task EmptyReadDatabaseAsync() => await _ctx.Users.DeleteManyAsync(u => true);

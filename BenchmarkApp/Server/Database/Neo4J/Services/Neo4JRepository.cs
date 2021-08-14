@@ -10,25 +10,55 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     public class Neo4JRepository : IDataRepository<Neo4JRepository>
     {
         private readonly IGraphClient _client;
-        public Neo4JRepository(IGraphClient client) => _client = client;
+        private readonly FakeDataGeneratorService _faker;
+
+        public Neo4JRepository(IGraphClient client, FakeDataGeneratorService faker)
+        {
+            _client = client;
+            _faker = faker;
+        }
 
         public async Task<int> LoadAggregateAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
             var result = (await _client.Cypher
-                .Match("(n:User)")
-                .Return<double>("n.age")
-                .Limit(howMany)
-                .ResultsAsync)
+                    .Match("(n:User)")
+                    .Return<double>("n.age")
+                    .Limit(howMany)
+                    .ResultsAsync)
                 .Average();
 
             return howMany;
         }
 
-        public Task<int> WriteEntitiesAsync(int level)
+        public async Task<int> WriteEntitiesAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var names = Enumerable.Range(1, howMany).Select(i => Config.UserName(level, i)).ToList();
+            var fakeUsers = _faker.GenerateFakeUsers<Neo4JUserEntity>(names).ToList();
+
+            foreach (var userEntity in fakeUsers)
+            {
+                userEntity.Id = Guid.NewGuid().ToString();
+            }
+
+            await _client.Cypher
+                .Unwind(fakeUsers, "friend")
+                .Merge("(user:WriteUser {" +
+                       "identifier: friend.identifier, " +
+                       "id: friend.id," +
+                       "firstName:friend.firstName," +
+                       "lastName:friend.lastName," +
+                       "age: friend.age," +
+                       "email:friend.email," +
+                       "userName:friend.userName," +
+                       "gender:friend.gender}" +
+                       ")")
+                .ExecuteWithoutResultsAsync();
+
+            return howMany;
         }
 
         public Task<int> WriteNestedEntitiesAsync(int level)

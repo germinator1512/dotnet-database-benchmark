@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Shared;
 
@@ -10,29 +8,12 @@ namespace BenchmarkApp.Server.Database.Core
     public class TimerService
     {
         /// <summary>
-        /// executes the given function with 0 .. Config.NestedUsers as parameters
-        /// </summary>
-        /// <param name="benchmarkFunction">function to execute </param>
-        /// <returns>List of Benchmark-results of given function</returns>
-        public static async Task<IEnumerable<BenchmarkResult>> BenchmarkAsync(Func<int, Task<int>> benchmarkFunction)
-        {
-            var results = new List<BenchmarkResult>();
-            foreach (var level in Enumerable.Range(0, Config.NestedUserLevels))
-            {
-                var result = await ExecuteBenchmarkAsync(benchmarkFunction, level);
-                results.Add(result);
-            }
-
-            return results;
-        }
-
-        /// <summary>
         /// measures execution time of the given function
         /// </summary>
         /// <param name="timerFunction">function to execute</param>
         /// <param name="level">parameter for timerFunction</param>
         /// <returns></returns>
-        private static async Task<BenchmarkResult> ExecuteBenchmarkAsync(
+        public static async Task<BenchmarkResult> ExecuteBenchmarkAsync(
             Func<int, Task<int>> timerFunction,
             int level)
         {
