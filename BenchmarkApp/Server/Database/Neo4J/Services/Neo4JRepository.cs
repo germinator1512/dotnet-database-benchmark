@@ -101,7 +101,12 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
         }
 
 
-        public async Task<bool> IsDatabaseEmptyAsync()
+        public Task EmptyWriteDatabaseAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> IsReadDatabaseEmptyAsync()
             => (await _client.Cypher
                     .Match("(n:User)")
                     .Return(n => n.Count())
@@ -110,7 +115,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Single() == 0;
 
 
-        public async Task EmptyDatabaseAsync()
+        public async Task EmptyReadDatabaseAsync()
             => await _client.Cypher
                 .Match("(n)")
                 .DetachDelete("n")

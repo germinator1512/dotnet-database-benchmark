@@ -50,9 +50,9 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             try
             {
                 await _client.ConnectAsync();
-                await _repository.EmptyDatabaseAsync();
+                await _repository.EmptyReadDatabaseAsync();
 
-                var isEmpty = await _repository.IsDatabaseEmptyAsync();
+                var isEmpty = await _repository.IsReadDatabaseEmptyAsync();
                 if (isEmpty) await AddDataSetAsync();
 
                 return new InsertResult

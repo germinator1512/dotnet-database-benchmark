@@ -55,7 +55,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             throw new NotImplementedException();
         }
 
-        public async Task ConnectAsync() => await IsDatabaseEmptyAsync();
+        public async Task ConnectAsync() => await IsReadDatabaseEmptyAsync();
 
         private async Task LoadFriendsRecursively(
             MongoUserEntity root,
@@ -69,8 +69,13 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                     await LoadFriendsRecursively(friend, nestedLevels, currentLevel + 1);
         }
 
-        public async Task<bool> IsDatabaseEmptyAsync() => !(await _ctx.Users.Find(_ => true).ToListAsync()).Any();
+        public Task EmptyWriteDatabaseAsync()
+        {
+            throw new NotImplementedException();
+        }
 
-        public async Task EmptyDatabaseAsync() => await _ctx.Users.DeleteManyAsync(u => true);
+        public async Task<bool> IsReadDatabaseEmptyAsync() => !(await _ctx.Users.Find(_ => true).ToListAsync()).Any();
+
+        public async Task EmptyReadDatabaseAsync() => await _ctx.Users.DeleteManyAsync(u => true);
     }
 }

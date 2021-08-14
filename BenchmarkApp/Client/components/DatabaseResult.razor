@@ -49,30 +49,54 @@
         <h4>Neighbour Benchmark Results</h4>
         <Table Results="_neighbourResults"></Table>
     }
-    
-    
-     <div style="height: 20px"> </div>
-    
-        <div class="margin">
-            <button class="btn btn-primary" @onclick="(async () => await StartAggregateBenchmark())">Start Agreggate Benchmark</button>
-    
-            @if (!_isAggregateLoading)
-            {
-                <span> Loading aggregated value of users (for example age distribution)  </span>
-            }
-            @if (_isAggregateLoading)
-            {
-                <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
-            }
-        </div>
-    
-        <div style="height: 15px"> </div>
-    
-        @if (_aggregateResults != null)
+
+
+    <div style="height: 20px"> </div>
+
+    <div class="margin">
+        <button class="btn btn-primary" @onclick="(async () => await StartAggregateBenchmark())">Start Agreggate Benchmark</button>
+
+        @if (!_isAggregateLoading)
         {
-            <h4>Aggregate Benchmark Results</h4>
-            <Table Results="_aggregateResults"></Table>
+            <span> Loading aggregated value of users (for example age distribution) </span>
         }
+        @if (_isAggregateLoading)
+        {
+            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+        }
+    </div>
+
+    <div style="height: 15px"> </div>
+
+    @if (_aggregateResults != null)
+    {
+        <h4>Aggregate Benchmark Results</h4>
+        <Table Results="_aggregateResults"></Table>
+    }
+
+
+    <div style="height: 20px"> </div>
+
+    <div class="margin">
+        <button class="btn btn-primary" @onclick="(async () => await StartWriteBenchmark())">Start Write Benchmark</button>
+
+        @if (!_isWriteLoading)
+        {
+            <span> Writing n randomly generated users to database </span>
+        }
+        @if (_isWriteLoading)
+        {
+            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
+        }
+    </div>
+
+    <div style="height: 15px"> </div>
+
+    @if (_writeResults != null)
+    {
+        <h4>Aggregate Benchmark Results</h4>
+        <Table Results="_writeResults"></Table>
+    }
 
 </div>
 
@@ -87,10 +111,12 @@
     private IEnumerable<BenchmarkResult> _neighbourResults;
     private IEnumerable<BenchmarkResult> _userResults;
     private IEnumerable<BenchmarkResult> _aggregateResults;
+    private IEnumerable<BenchmarkResult> _writeResults;
 
     private bool _isNeighbourLoading;
     private bool _isUserLoading;
     private bool _isAggregateLoading;
+    private bool _isWriteLoading;
 
     private async Task StartNeighbourBenchmark()
     {
@@ -105,12 +131,19 @@
         _userResults = await CallApi($"benchmark/{BaseUrl}/user");
         _isUserLoading = false;
     }
-    
+
     private async Task StartAggregateBenchmark()
     {
         _isAggregateLoading = true;
         _aggregateResults = await CallApi($"benchmark/{BaseUrl}/aggregate");
         _isAggregateLoading = false;
+    }
+
+    private async Task StartWriteBenchmark()
+    {
+        _isWriteLoading = true;
+        _writeResults = await CallApi($"benchmark/{BaseUrl}/write");
+        _isWriteLoading = false;
     }
 
     private async Task<IEnumerable<BenchmarkResult>> CallApi(string url)

@@ -12,7 +12,6 @@ namespace BenchmarkApp.Server.Controllers
     public class BenchmarkController<T> where T: class, IDataRepository<T>
     {
         private readonly BenchmarkService<T> _benchmarkService;
-
         private readonly ILogger<T> _logger;
 
         protected BenchmarkController(BenchmarkService<T> benchmarkService, ILogger<T> logger)

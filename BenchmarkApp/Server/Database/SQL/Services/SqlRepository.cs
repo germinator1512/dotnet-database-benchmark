@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
+using BenchmarkApp.Server.Database.SQL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BenchmarkApp.Server.Database.SQL.Services
@@ -9,27 +10,47 @@ namespace BenchmarkApp.Server.Database.SQL.Services
     public class SqlRepository : IDataRepository<SqlRepository>
     {
         private readonly SqlDatabaseContext _ctx;
+        private readonly FakeDataGeneratorService _faker;
 
-        public SqlRepository(SqlDatabaseContext context) => _ctx = context;
+        public SqlRepository(SqlDatabaseContext context, FakeDataGeneratorService faker)
+        {
+            _ctx = context;
+            _faker = faker;
+        }
 
         public async Task<int> LoadEntitiesAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
-            var users = _ctx.Users.Take(howMany);
-            var asyncUsers = await users.ToListAsync();
-            return asyncUsers.Count;
+            
+            var users = await _ctx.Users
+                .Take(howMany)
+                .OrderBy(u => u.Id)
+                .ToListAsync();
+
+            return (users).Count;
         }
 
         public async Task<int> LoadAggregateAsync(int level)
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
-            var avg = _ctx.Users.Take(howMany).Average(t => t.Age);
+            var avg = _ctx.Users
+                .Take(howMany)
+                .OrderBy(u => u.Id)
+                .Average(t => t.Age);
+
             return howMany;
         }
 
-        public Task<int> WriteEntitiesAsync(int level)
+        public async Task<int> WriteEntitiesAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var names = Enumerable.Range(1, howMany).Select(i => Config.UserName(level, i)).ToList();
+            var fakeUsers = _faker.GenerateFakeUsers<SqlWriteUserEntity>(names);
+
+            await _ctx.WriteUsers.AddRangeAsync(fakeUsers);
+            await _ctx.SaveChangesAsync();
+            return howMany;
         }
 
         public Task<int> WriteNestedEntitiesAsync(int level)
@@ -39,14 +60,21 @@ namespace BenchmarkApp.Server.Database.SQL.Services
 
         public async Task ConnectAsync() => await LoadEntitiesAsync(1);
 
-        public async Task EmptyDatabaseAsync()
+        public async Task EmptyReadDatabaseAsync()
         {
             _ctx.Friendships.RemoveRange(_ctx.Friendships);
             _ctx.Users.RemoveRange(_ctx.Users);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task<bool> IsDatabaseEmptyAsync() => await Task.FromResult(!_ctx.Users.Any());
+        public async Task EmptyWriteDatabaseAsync()
+        {
+            _ctx.WriteFriendships.RemoveRange(_ctx.WriteFriendships);
+            _ctx.WriteUsers.RemoveRange(_ctx.WriteUsers);
+            await _ctx.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsReadDatabaseEmptyAsync() => await Task.FromResult(!_ctx.Users.Any());
 
         public async Task<int> LoadNestedEntitiesAsync(int level)
         {

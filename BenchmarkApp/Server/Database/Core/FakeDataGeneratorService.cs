@@ -22,7 +22,7 @@ namespace BenchmarkApp.Server.Database.Core
                 .Generate();
 
 
-        public IEnumerable<T> GenerateFakeUsers<T>(int howMany, IList<string> identifiers) where T : class, IBaseUser =>
-            Enumerable.Range(0, howMany).Select((index) => GenerateFakeUser<T>(identifiers[index]));
+        public IEnumerable<T> GenerateFakeUsers<T>(IList<string> identifiers) where T : class, IBaseUser =>
+            Enumerable.Range(0, identifiers.Count).Select((index) => GenerateFakeUser<T>(identifiers[index]));
     }
 }

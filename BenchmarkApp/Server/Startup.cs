@@ -67,9 +67,6 @@ namespace BenchmarkApp.Server
             services.AddTransient<PostgresInitializerService>();
             services.AddTransient<MongoInitializerService>();
             services.AddTransient<Neo4JInitializerService>();
-
-
-            // services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromHours(2));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

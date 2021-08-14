@@ -32,12 +32,14 @@ namespace BenchmarkApp.Server.Services.Interfaces
         public async Task<IEnumerable<BenchmarkResult>> StartWriteBenchmarkAsync()
         {
             await _repository.ConnectAsync();
+            await _repository.EmptyWriteDatabaseAsync();
             return await TimerService.BenchmarkAsync(_repository.WriteEntitiesAsync);
         }
 
         public async Task<IEnumerable<BenchmarkResult>> StartNestedWriteBenchmarkAsync()
         {
             await _repository.ConnectAsync();
+            await _repository.EmptyWriteDatabaseAsync();
             return await TimerService.BenchmarkAsync(_repository.WriteNestedEntitiesAsync);
         }
     }

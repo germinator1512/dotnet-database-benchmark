@@ -52,6 +52,7 @@ namespace BenchmarkApp.Server.Database.Core
         
         
         
+        
         // Helper functions
         
         /// <summary>
@@ -61,15 +62,22 @@ namespace BenchmarkApp.Server.Database.Core
         Task ConnectAsync();
 
         /// <summary>
-        /// Truncates all Data from Database
+        /// Truncates all Data from tables specified for read operations
         /// </summary>
         /// <returns></returns>
-        Task EmptyDatabaseAsync();
+        Task EmptyReadDatabaseAsync();
+        
+        
+        /// <summary>
+        /// Truncates all Data from tables specified for write operations
+        /// </summary>
+        /// <returns></returns>
+        Task EmptyWriteDatabaseAsync();
 
         /// <summary>
         /// Checks if database contains any data
         /// </summary>
         /// <returns></returns>
-        Task<bool> IsDatabaseEmptyAsync();
+        Task<bool> IsReadDatabaseEmptyAsync();
     }
 }

@@ -14,6 +14,10 @@ namespace BenchmarkApp.Server.Database.SQL.Services
         public DbSet<SqlFriendshipEntity> Friendships { get; set; }
 
 
+        public DbSet<SqlWriteUserEntity> WriteUsers { get; set; }
+
+        public DbSet<SqlWriteFriendshipEntity> WriteFriendships { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SqlUserEntity>()
@@ -34,6 +38,31 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                 .HasForeignKey(r => r.FriendBId);
 
             modelBuilder.Entity<SqlFriendshipEntity>()
+                .HasOne(r => r.FriendA)
+                .WithMany(p => p.FriendShips)
+                .HasForeignKey(r => r.FriendAId);
+            
+            
+            
+            
+            modelBuilder.Entity<SqlWriteUserEntity>()
+                .HasKey(f => f.Id);
+
+            modelBuilder.Entity<SqlWriteFriendshipEntity>()
+                .HasKey(f => new {f.FriendAId, f.FriendBId});
+
+            modelBuilder.Entity<SqlWriteFriendshipEntity>()
+                .HasIndex(f => f.FriendAId);
+
+            modelBuilder.Entity<SqlWriteFriendshipEntity>()
+                .HasIndex(f => f.FriendBId);
+
+            modelBuilder.Entity<SqlWriteFriendshipEntity>()
+                .HasOne(r => r.FriendB)
+                .WithMany()
+                .HasForeignKey(r => r.FriendBId);
+
+            modelBuilder.Entity<SqlWriteFriendshipEntity>()
                 .HasOne(r => r.FriendA)
                 .WithMany(p => p.FriendShips)
                 .HasForeignKey(r => r.FriendAId);

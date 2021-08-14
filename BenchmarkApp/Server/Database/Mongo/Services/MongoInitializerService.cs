@@ -28,9 +28,9 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             try
             {
-                await _mongoRepository.EmptyDatabaseAsync();
+                await _mongoRepository.EmptyReadDatabaseAsync();
 
-                if (await _mongoRepository.IsDatabaseEmptyAsync())
+                if (await _mongoRepository.IsReadDatabaseEmptyAsync())
                     await AddDataSetAsync();
 
                 return new InsertResult

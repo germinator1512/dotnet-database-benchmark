@@ -31,9 +31,9 @@ namespace BenchmarkApp.Server.Database.SQL.Services
                 await _context.Database.MigrateAsync();
                 await _context.SaveChangesAsync();
 
-                await _repository.EmptyDatabaseAsync();
+                await _repository.EmptyReadDatabaseAsync();
 
-                if (await _repository.IsDatabaseEmptyAsync())
+                if (await _repository.IsReadDatabaseEmptyAsync())
                     await AddDataSetAsync();
 
                 return new InsertResult
