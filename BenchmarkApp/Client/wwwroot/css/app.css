@@ -12,6 +12,10 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.margin-left{
+    margin-left: 15px;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;

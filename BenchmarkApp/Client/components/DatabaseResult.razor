@@ -7,96 +7,30 @@
 
     <div style="height: 20px"> </div>
 
-    <div class="margin">
-        <button class="btn btn-primary" @onclick="(async () => await StartUserBenchmark())">Start User Benchmark</button>
-        @if (!_isUserLoading)
-        {
-            <span> Loading n random users from Database</span>
-        }
-        @if (_isUserLoading)
-        {
-            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
-        }
-    </div>
+
+    <SingleResult Description="Loading n random users from Database" Title="User" Url="/user" BaseUrl="@BaseUrl"></SingleResult>
+    <div style="height: 15px"> </div>
+
+
+    <SingleResult Description="Finding specific user and loading n level of friends (Every User has 10 friends)" Title="Neighbours"
+                  Url="/neighbour" BaseUrl="@BaseUrl">
+    </SingleResult>
 
     <div style="height: 15px"> </div>
 
-    @if (_userResults != null)
-    {
-        <h4>User Benchmark Results</h4>
-        <Table Results="_userResults"></Table>
-    }
 
-    <div style="height: 20px"> </div>
-
-    <div class="margin">
-        <button class="btn btn-primary" @onclick="(async () => await StartNeighbourBenchmark())">Start Neighbours Benchmark</button>
-
-        @if (!_isNeighbourLoading)
-        {
-            <span> Finding specific user and loading n level of friends (Every User has 10 friends) </span>
-        }
-        @if (_isNeighbourLoading)
-        {
-            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
-        }
-    </div>
-
+    <SingleResult Description="Loading aggregated value of users (for example age distribution)" Title="Aggregate"
+                  Url="/aggregate" BaseUrl="@BaseUrl">
+    </SingleResult>
     <div style="height: 15px"> </div>
 
-    @if (_neighbourResults != null)
-    {
-        <h4>Neighbour Benchmark Results</h4>
-        <Table Results="_neighbourResults"></Table>
-    }
 
+    <SingleResult Description="Writing n randomly generated users to database" Title="Write"
+                  Url="/write" BaseUrl="@BaseUrl">
+    </SingleResult>
 
-    <div style="height: 20px"> </div>
-
-    <div class="margin">
-        <button class="btn btn-primary" @onclick="(async () => await StartAggregateBenchmark())">Start Agreggate Benchmark</button>
-
-        @if (!_isAggregateLoading)
-        {
-            <span> Loading aggregated value of users (for example age distribution) </span>
-        }
-        @if (_isAggregateLoading)
-        {
-            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
-        }
-    </div>
 
     <div style="height: 15px"> </div>
-
-    @if (_aggregateResults != null)
-    {
-        <h4>Aggregate Benchmark Results</h4>
-        <Table Results="_aggregateResults"></Table>
-    }
-
-
-    <div style="height: 20px"> </div>
-
-    <div class="margin">
-        <button class="btn btn-primary" @onclick="(async () => await StartWriteBenchmark())">Start Write Benchmark</button>
-
-        @if (!_isWriteLoading)
-        {
-            <span> Writing n randomly generated users to database </span>
-        }
-        @if (_isWriteLoading)
-        {
-            <span style="margin-left: 15px"> .. Benchmark is loading, please wait</span>
-        }
-    </div>
-
-    <div style="height: 15px"> </div>
-
-    @if (_writeResults != null)
-    {
-        <h4>Aggregate Benchmark Results</h4>
-        <Table Results="_writeResults"></Table>
-    }
 
 </div>
 
@@ -107,46 +41,5 @@
 
     [Parameter]
     public string BaseUrl { get; set; }
-
-    private IEnumerable<BenchmarkResult> _neighbourResults;
-    private IEnumerable<BenchmarkResult> _userResults;
-    private IEnumerable<BenchmarkResult> _aggregateResults;
-    private IEnumerable<BenchmarkResult> _writeResults;
-
-    private bool _isNeighbourLoading;
-    private bool _isUserLoading;
-    private bool _isAggregateLoading;
-    private bool _isWriteLoading;
-
-    private async Task StartNeighbourBenchmark()
-    {
-        _isNeighbourLoading = true;
-        _neighbourResults = await CallApi($"benchmark/{BaseUrl}/neighbour");
-        _isNeighbourLoading = false;
-    }
-
-    private async Task StartUserBenchmark()
-    {
-        _isUserLoading = true;
-        _userResults = await CallApi($"benchmark/{BaseUrl}/user");
-        _isUserLoading = false;
-    }
-
-    private async Task StartAggregateBenchmark()
-    {
-        _isAggregateLoading = true;
-        _aggregateResults = await CallApi($"benchmark/{BaseUrl}/aggregate");
-        _isAggregateLoading = false;
-    }
-
-    private async Task StartWriteBenchmark()
-    {
-        _isWriteLoading = true;
-        _writeResults = await CallApi($"benchmark/{BaseUrl}/write");
-        _isWriteLoading = false;
-    }
-
-    private async Task<IEnumerable<BenchmarkResult>> CallApi(string url)
-        => await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>(url);
 
 }

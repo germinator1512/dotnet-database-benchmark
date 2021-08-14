@@ -1,0 +1,53 @@
+﻿@using BenchmarkApp.Shared
+@inject HttpClient Http
+
+
+<div class="margin">
+    <button class="btn btn-primary" @onclick="(async () => await StartBenchmark())">Start @Title Benchmark</button>
+    @if (!_isLoading)
+    {
+        <span class="margin-left">@Description</span>
+    }
+    @if (_isLoading)
+    {
+        <span class="margin-left"> .. Benchmark is loading, please wait</span>
+    }
+</div>
+
+<div style="height: 30px"> </div>
+
+@if (_results != null)
+{
+    <h4>Benchmark Results</h4>
+    <Table Results="_results"></Table>
+}
+
+<div style="height: 20px"> </div>
+
+@code {
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    [Parameter]
+    public string Url { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    private IEnumerable<BenchmarkResult> _results;
+
+
+    private bool _isLoading;
+
+    private async Task StartBenchmark()
+    {
+        _isLoading = true;
+        _results = await Http.GetFromJsonAsync<IEnumerable<BenchmarkResult>>(BaseUrl + Url);
+        _isLoading = false;
+    }
+
+}
