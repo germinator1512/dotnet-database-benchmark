@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
@@ -11,6 +12,27 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
     {
         private readonly IGraphClient _client;
         private readonly FakeDataGeneratorService _faker;
+
+        private const string UserInsert = "(user:WriteUser {"
+                                          + "id : $id,"
+                                          + "identifier : $identifier,"
+                                          + "firstName : $firstName,"
+                                          + "lastName : $lastName,"
+                                          + "age : $age,"
+                                          + "email : $email,"
+                                          + "userName : $userName,"
+                                          + "gender : $gender})";
+
+        private const string UserInsertWithFriends = "(user:WriteUser {" +
+                                                     "identifier: friend.identifier, " +
+                                                     "id: friend.id," +
+                                                     "firstName:friend.firstName," +
+                                                     "lastName:friend.lastName," +
+                                                     "age: friend.age," +
+                                                     "email:friend.email," +
+                                                     "userName:friend.userName," +
+                                                     "gender:friend.gender}" +
+                                                     ") <-[:KNOWS]-(root)";
 
         public Neo4JRepository(IGraphClient client, FakeDataGeneratorService faker)
         {
@@ -61,10 +83,42 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
             return howMany;
         }
 
-        public Task<int> WriteNestedEntitiesAsync(int level)
+        public async Task<int> WriteNestedEntitiesAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var firstUser = _faker.GenerateFakeUser<Neo4JUserEntity>(Config.RootUserName);
+            firstUser.Id = Guid.NewGuid().ToString();
+            await InsertSingleUserAsync(firstUser);
+
+
+            var names = Enumerable.Range(1, howMany).Select(i => Config.UserName(level, i)).ToList();
+            var fakeUsers = _faker.GenerateFakeUsers<Neo4JUserEntity>(names).ToList();
+
+            foreach (var userEntity in fakeUsers)
+            {
+                userEntity.Id = Guid.NewGuid().ToString();
+            }
+
+
+            await InsertUsersAsFriendsAsync(firstUser, fakeUsers);
+            return howMany;
         }
+
+        private async Task InsertUsersAsFriendsAsync(Neo4JUserEntity rootUser, IEnumerable<Neo4JUserEntity> friends)
+            => await _client.Cypher
+                .Match("(root:WriteUser)")
+                .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)
+                .Unwind(friends, "friend")
+                .Merge(UserInsertWithFriends)
+                .WithParam("rootId", rootUser.Id)
+                .ExecuteWithoutResultsAsync();
+
+        private async Task InsertSingleUserAsync(Neo4JUserEntity single)
+            => await _client.Cypher
+                .Create(UserInsert)
+                .WithParams(single.ToMap())
+                .ExecuteWithoutResultsAsync();
 
         public async Task ConnectAsync()
         {
