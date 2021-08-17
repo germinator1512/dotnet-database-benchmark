@@ -65,9 +65,25 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return howMany;
         }
 
-        public Task<int> WriteNestedEntitiesAsync(int level)
+        public async Task<int> WriteNestedEntitiesAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+            var firstUser = _faker.GenerateFakeUser<MongoUserEntity>(Config.RootUserName);
+
+
+            var friends = Enumerable
+                .Range(1, howMany)
+                .Select(z => _faker.GenerateFakeUser<MongoUserEntity>(Config.UserName(level, z)))
+                .ToList();
+
+            await _ctx.WriteUsers.InsertManyAsync(friends);
+
+            firstUser.FriendIds.AddRange(friends.Select(f => new MongoDBRef("users", f.Id)));
+
+            await _ctx.WriteUsers.InsertOneAsync(firstUser);
+
+            return howMany;
         }
 
         public async Task ConnectAsync() => await IsReadDatabaseEmptyAsync();
