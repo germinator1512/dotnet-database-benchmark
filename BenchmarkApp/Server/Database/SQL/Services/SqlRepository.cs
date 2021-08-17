@@ -23,8 +23,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
             var users = await _ctx.Users
-                .Take(howMany)
                 .OrderBy(u => u.Id)
+                .Take(howMany)
                 .ToListAsync();
 
             return (users).Count;
@@ -35,8 +35,8 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
             var avg = _ctx.Users
-                .Take(howMany)
                 .OrderBy(u => u.Id)
+                .Take(howMany)
                 .Average(t => t.Age);
 
             return howMany;
