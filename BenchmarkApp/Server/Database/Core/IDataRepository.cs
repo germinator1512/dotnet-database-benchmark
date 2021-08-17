@@ -44,7 +44,7 @@ namespace BenchmarkApp.Server.Database.Core
 
 
         /// <summary>
-        /// writes 10 ^ (level + 1) nested users to database
+        /// writes 10 ^ (level + 1) users to database which are all connected to a single user
         /// </summary>
         /// <param name="level"></param>
         /// <returns>total number of written entities</returns>
@@ -75,7 +75,7 @@ namespace BenchmarkApp.Server.Database.Core
         Task EmptyWriteDatabaseAsync();
 
         /// <summary>
-        /// Checks if database contains any data
+        /// Checks if read database contains any data
         /// </summary>
         /// <returns></returns>
         Task<bool> IsReadDatabaseEmptyAsync();

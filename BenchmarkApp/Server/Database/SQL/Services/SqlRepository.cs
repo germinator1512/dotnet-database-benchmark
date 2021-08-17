@@ -54,10 +54,32 @@ namespace BenchmarkApp.Server.Database.SQL.Services
             return howMany;
         }
 
-        public Task<int> WriteNestedEntitiesAsync(int level)
+
+        public async Task<int> WriteNestedEntitiesAsync(int level)
         {
-            throw new NotImplementedException();
+            var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
+
+
+            var firstUser = _faker.GenerateFakeUser<SqlWriteUserEntity>(Config.RootUserName);
+            await _ctx.WriteUsers.AddAsync(firstUser);
+
+
+            var friends = Enumerable
+                .Range(1, howMany)
+                .Select(z => new SqlWriteFriendshipEntity()
+                {
+                    FriendA = firstUser,
+                    FriendAId = firstUser.Id,
+                    FriendB = _faker.GenerateFakeUser<SqlWriteUserEntity>(Config.UserName(level, z))
+                }).ToList();
+
+            await _ctx.WriteFriendships.AddRangeAsync(friends);
+
+            await _ctx.SaveChangesAsync();
+
+            return howMany;
         }
+
 
         public async Task ConnectAsync() => await LoadEntitiesAsync(1);
 
