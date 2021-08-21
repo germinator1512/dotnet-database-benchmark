@@ -10,7 +10,6 @@ using BenchmarkApp.Server.Database.Neo4J;
 using BenchmarkApp.Server.Database.Neo4J.Services;
 using BenchmarkApp.Server.Database.SQL.Services;
 using BenchmarkApp.Server.Services;
-using BenchmarkApp.Server.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Neo4jClient;
 using Newtonsoft.Json.Serialization;
@@ -37,9 +36,9 @@ namespace BenchmarkApp.Server
             services.AddDbContext<SqlDatabaseContext>((_, options) =>
             {
                 var connectionString = _configuration.GetConnectionString("Postgres");
-                options.UseNpgsql(connectionString);
-                // .LogTo(Console.WriteLine)
-                // .EnableSensitiveDataLogging();
+                options.UseNpgsql(connectionString)
+                    .LogTo(Console.WriteLine)
+                    .EnableSensitiveDataLogging();
             });
 
             var neo4JClient = new GraphClient(new Uri(config.ClientUrl), config.User, config.Password)
@@ -54,12 +53,12 @@ namespace BenchmarkApp.Server
             services.AddTransient<IDataRepository<MongoRepository>, MongoRepository>();
             services.AddTransient<IDataRepository<Neo4JRepository>, Neo4JRepository>();
             services.AddTransient<IDataRepository<SqlRepository>, SqlRepository>();
-            
+
             services.AddTransient<BenchmarkService<MongoRepository>, MongoBenchmarkService>();
             services.AddTransient<BenchmarkService<Neo4JRepository>, Neo4JBenchmarkService>();
             services.AddTransient<BenchmarkService<SqlRepository>, SqlBenchmarkService>();
-            
-            
+
+
             services.AddTransient<TimerService>();
             services.AddTransient<FakeDataGeneratorService>();
 

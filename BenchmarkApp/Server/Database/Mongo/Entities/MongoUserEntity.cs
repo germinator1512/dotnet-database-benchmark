@@ -36,8 +36,11 @@ namespace BenchmarkApp.Server.Database.Mongo.Entities
         {
             var filterDef = new FilterDefinitionBuilder<MongoUserEntity>();
 
+            var friendRefs = FriendIds.Select(f => f.Id);
+            var definition = filterDef.In(x => x.Id, friendRefs);
+            
             Friends = await context.Users
-                .Find(filterDef.In(x => x.Id, FriendIds.Select(f => f.Id)))
+                .Find(definition)
                 .ToListAsync();
         }
     }

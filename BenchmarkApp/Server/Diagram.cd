@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BenchmarkApp.Server.Database.Mongo.Entities.MongoUserEntity" Collapsed="true">
+    <Position X="6.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAABCAAAACAAEAAAAAAAAABAAAAAQAAQAQAAAg=</HashCode>
+      <FileName>Database\Mongo\Entities\MongoUserEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BenchmarkApp.Server.Database.Neo4J.Entities.Neo4JUserEntity" Collapsed="true">
+    <Position X="6.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAABCAAAACAAEAAAAAABAAAAAAAAQAAQAAAAAg=</HashCode>
+      <FileName>Database\Neo4J\Entities\Neo4jUserEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.221" />
+  </Class>
+  <Class Name="BenchmarkApp.Server.Database.SQL.Entities.SqlUserEntity" Collapsed="true">
+    <Position X="6.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAAACAAAAKAAEAAAAAAAAAAAAAAAQAAQAAAAAg=</HashCode>
+      <FileName>Database\SQL\Entities\SqlUserEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BenchmarkApp.Server.Database.SQL.Services.SqlRepository" Collapsed="true">
+    <Position X="11.5" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAQAAAAAAACAAAAAAAAAAAAAkBAAAAAAIAAACAQgA=</HashCode>
+      <FileName>Database\SQL\Services\SqlRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BenchmarkApp.Server.Database.Neo4J.Services.Neo4JRepository" Collapsed="true">
+    <Position X="11.5" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAQAAAAAAACEAACEAAAAAAAAmAAAEAAAoAAACAQgA=</HashCode>
+      <FileName>Database\Neo4J\Services\Neo4JRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BenchmarkApp.Server.Database.Mongo.Services.MongoRepository" Collapsed="true">
+    <Position X="11.5" Y="3" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAQAAAAAAACAAAAAAAAAgAAAkBAAAAAAIAAACAQgA=</HashCode>
+      <FileName>Database\Mongo\Services\MongoRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="BenchmarkApp.Server.Database.Core.IBaseUser">
+    <Position X="5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAACAAAACAAEAAAAAAAAAAAAAAAQAAQAAAAAg=</HashCode>
+      <FileName>Database\Core\IBaseUser.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BenchmarkApp.Server.Database.Core.IDataRepository&lt;T&gt;">
+    <Position X="9.25" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>FAAAQAAAAAAACAAAAAAAAAAAAAkAAAAAAAIAAAAAQgA=</HashCode>
+      <FileName>Database\Core\IDataRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

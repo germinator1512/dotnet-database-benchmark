@@ -40,14 +40,14 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
         {
             var howMany = (int) Math.Pow(Config.FriendsPerUser, level + 1);
 
-            var agg = _ctx.Users.AsQueryable()
+            var average = _ctx.Users.AsQueryable()
                 .OrderBy(u => u.Id)
                 .Take(howMany)
                 .GroupBy(x => true)
                 .Select(g => g.Average(s => s.Age))
-                .Take(1);
-
-            var average = agg.ToList()[0];
+                .Take(1)
+                .First();
+            
             return howMany;
         }
 

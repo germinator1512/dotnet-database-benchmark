@@ -1,5 +1,5 @@
 ﻿using BenchmarkApp.Server.Database.SQL.Services;
-using BenchmarkApp.Server.Services.Interfaces;
+using BenchmarkApp.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

@@ -1,6 +1,5 @@
 ﻿using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.Neo4J.Services;
-using BenchmarkApp.Server.Services.Interfaces;
 
 namespace BenchmarkApp.Server.Services
 {

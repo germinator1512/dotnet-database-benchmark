@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Shared;
 
-namespace BenchmarkApp.Server.Services.Interfaces
+namespace BenchmarkApp.Server.Services
 {
-    public class BenchmarkService<T> where T : class, IDataRepository<T>
+    public abstract class BenchmarkService<T> where T : class, IDataRepository<T>
     {
         protected BenchmarkService(IDataRepository<T> repository) => _repository = repository;
 

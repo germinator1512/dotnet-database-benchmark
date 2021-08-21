@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
-using BenchmarkApp.Server.Services.Interfaces;
+using BenchmarkApp.Server.Services;
 using BenchmarkApp.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace BenchmarkApp.Server.Controllers
 {
     [ApiController]
-    public class BenchmarkController<T> where T: class, IDataRepository<T>
+    public abstract class BenchmarkController<T> where T: class, IDataRepository<T>
     {
         private readonly BenchmarkService<T> _benchmarkService;
         private readonly ILogger<T> _logger;

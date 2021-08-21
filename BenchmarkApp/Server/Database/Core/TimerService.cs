@@ -11,23 +11,23 @@ namespace BenchmarkApp.Server.Database.Core
         /// measures execution time of the given function
         /// </summary>
         /// <param name="timerFunction">function to execute</param>
-        /// <param name="level">parameter for timerFunction</param>
+        /// <param name="methodParam">parameter for timerFunction</param>
         /// <returns></returns>
         public static async Task<BenchmarkResult> ExecuteBenchmarkAsync(
             Func<int, Task<int>> timerFunction,
-            int level)
+            int methodParam)
         {
             var timer = new Stopwatch();
             timer.Start();
 
             try
             {
-                var loadedEntities = await timerFunction(level);
+                var loadedEntities = await timerFunction(methodParam);
 
                 timer.Stop();
                 return new BenchmarkResult
                 {
-                    Level = level,
+                    Level = methodParam,
                     Success = true,
                     LoadedEntities = loadedEntities,
                     MilliSeconds = timer.ElapsedMilliseconds
@@ -38,7 +38,7 @@ namespace BenchmarkApp.Server.Database.Core
                 timer.Stop();
                 return new BenchmarkResult
                 {
-                    Level = level,
+                    Level = methodParam,
                     Success = false,
                     LoadedEntities = 0,
                     MilliSeconds = timer.ElapsedMilliseconds,
