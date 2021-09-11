@@ -1,15 +1,11 @@
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BenchmarkApp.Server.Database.Core;
 using BenchmarkApp.Server.Database.SQL.Services;
-using BenchmarkApp.Shared;
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Newtonsoft.Json;
 
 namespace BenchmarkApp.Server.Test.Integration
 {
@@ -40,18 +36,7 @@ namespace BenchmarkApp.Server.Test.Integration
                 _sqlRepo.Verify(r => r.LoadEntitiesAsync(i), Times.Once);
             }
 
-            var result = JsonConvert.DeserializeObject<BenchmarkResult[]>(
-                await response.Content.ReadAsStringAsync()
-            );
-
-            result.Length.Should().Be(MaxLevel);
-
-            foreach (var benchmarkResult in result)
-            {
-                benchmarkResult.Success.Should().Be(true);
-            }
-
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            await response.VerifyBenchmarkResult(MaxLevel);
         }
 
 
@@ -67,18 +52,7 @@ namespace BenchmarkApp.Server.Test.Integration
                 _sqlRepo.Verify(r => r.LoadNestedEntitiesAsync(i), Times.Once);
             }
 
-            var result = JsonConvert.DeserializeObject<BenchmarkResult[]>(
-                await response.Content.ReadAsStringAsync()
-            );
-
-            result.Length.Should().Be(MaxLevel);
-
-            foreach (var benchmarkResult in result)
-            {
-                benchmarkResult.Success.Should().Be(true);
-            }
-
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            await response.VerifyBenchmarkResult(MaxLevel);
         }
 
         [TestMethod]
@@ -94,18 +68,7 @@ namespace BenchmarkApp.Server.Test.Integration
                 _sqlRepo.Verify(r => r.LoadAggregateAsync(i), Times.Once);
             }
 
-            var result = JsonConvert.DeserializeObject<BenchmarkResult[]>(
-                await response.Content.ReadAsStringAsync()
-            );
-
-            result.Length.Should().Be(MaxLevel);
-
-            foreach (var benchmarkResult in result)
-            {
-                benchmarkResult.Success.Should().Be(true);
-            }
-
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            await response.VerifyBenchmarkResult(MaxLevel);
         }
 
         [TestMethod]
@@ -122,18 +85,7 @@ namespace BenchmarkApp.Server.Test.Integration
                 _sqlRepo.Verify(r => r.WriteEntitiesAsync(i), Times.Once);
             }
 
-            var result = JsonConvert.DeserializeObject<BenchmarkResult[]>(
-                await response.Content.ReadAsStringAsync()
-            );
-
-            result.Length.Should().Be(MaxLevel);
-
-            foreach (var benchmarkResult in result)
-            {
-                benchmarkResult.Success.Should().Be(true);
-            }
-
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            await response.VerifyBenchmarkResult(MaxLevel);
         }
 
         [TestMethod]
@@ -150,18 +102,7 @@ namespace BenchmarkApp.Server.Test.Integration
                 _sqlRepo.Verify(r => r.WriteNestedEntitiesAsync(i), Times.Once);
             }
 
-            var result = JsonConvert.DeserializeObject<BenchmarkResult[]>(
-                await response.Content.ReadAsStringAsync()
-            );
-
-            result.Length.Should().Be(MaxLevel);
-
-            foreach (var benchmarkResult in result)
-            {
-                benchmarkResult.Success.Should().Be(true);
-            }
-
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            await response.VerifyBenchmarkResult(MaxLevel);
         }
     }
 }
