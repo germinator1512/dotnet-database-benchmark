@@ -7,7 +7,7 @@
         public const string RootUserName = "Root-User";
         
         // standard is 6
-        public const int NestedUserLevels = 1;
+        public const int NestedUserLevels = 3;
         public const int FriendsPerUser = 2;
     }
 }

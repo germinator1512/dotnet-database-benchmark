@@ -111,7 +111,7 @@ namespace BenchmarkApp.Server.Database.Neo4J.Services
                 .Where((Neo4JUserEntity root) => root.Id == rootUser.Id)
                 .Unwind(friends, "friend")
                 .Merge(UserInsertWithFriends)
-                .WithParam("rootId", rootUser.Id)
+                // .WithParam("rootId", rootUser.Id)
                 .ExecuteWithoutResultsAsync();
 
         private async Task InsertSingleUserAsync(Neo4JUserEntity single)

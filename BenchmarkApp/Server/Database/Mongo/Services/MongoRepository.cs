@@ -45,7 +45,6 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
                 .Take(howMany)
                 .GroupBy(x => true)
                 .Select(g => g.Average(s => s.Age))
-                .Take(1)
                 .First();
             
             return howMany;
@@ -86,7 +85,7 @@ namespace BenchmarkApp.Server.Database.Mongo.Services
             return howMany;
         }
 
-        public async Task ConnectAsync() => await IsReadDatabaseEmptyAsync();
+        public async Task ConnectAsync() => await  LoadEntitiesAsync(1);
 
         private async Task LoadFriendsRecursively(
             MongoUserEntity root,
