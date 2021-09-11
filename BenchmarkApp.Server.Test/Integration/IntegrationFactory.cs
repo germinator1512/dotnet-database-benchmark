@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace BenchmarkApp.Server.Test
+namespace BenchmarkApp.Server.Test.Integration
 {
-    public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
+    public class IntegrationFactory<TStartup> : WebApplicationFactory<TStartup>
         where TStartup : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)

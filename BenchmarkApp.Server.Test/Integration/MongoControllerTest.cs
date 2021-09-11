@@ -18,7 +18,7 @@ namespace BenchmarkApp.Server.Test.Integration
 
         public MongoControllerTest()
         {
-            var factory = new CustomWebApplicationFactory<Startup>();
+            var factory = new IntegrationFactory<Startup>();
 
             _client = factory.CreateClient();
             _mongoRepo = factory.Services.GetRequiredService<Mock<IDataRepository<MongoRepository>>>();

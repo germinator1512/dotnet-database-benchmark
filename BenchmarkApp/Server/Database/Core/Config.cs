@@ -8,6 +8,6 @@
         
         // standard is 6
         public const int NestedUserLevels = 6;
-        public const int FriendsPerUser = 2;
+        public const int FriendsPerUser = 10;
     }
 }

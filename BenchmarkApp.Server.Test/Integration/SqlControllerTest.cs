@@ -19,7 +19,7 @@ namespace BenchmarkApp.Server.Test.Integration
 
         public SqlControllerTest()
         {
-            var factory = new CustomWebApplicationFactory<Startup>();
+            var factory = new IntegrationFactory<Startup>();
             _client = factory.CreateClient();
             _sqlRepo = factory.Services.GetRequiredService<Mock<IDataRepository<SqlRepository>>>();
         }

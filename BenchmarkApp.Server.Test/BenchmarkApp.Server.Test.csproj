@@ -17,7 +17,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BenchmarkApp\Server\BenchmarkApp.Server.csproj" />
+        <ProjectReference Include="..\BenchmarkApp\Server\BenchmarkApp.Server.csproj" />
     </ItemGroup>
-
+    <ItemGroup>
+        <Content Include="appsettings.Development.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

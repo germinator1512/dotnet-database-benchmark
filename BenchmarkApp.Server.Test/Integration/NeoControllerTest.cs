@@ -18,7 +18,7 @@ namespace BenchmarkApp.Server.Test.Integration
 
         public NeoControllerTest()
         {
-            var factory = new CustomWebApplicationFactory<Startup>();
+            var factory = new IntegrationFactory<Startup>();
             _client = factory.CreateClient();
             _neoRepo = factory.Services.GetRequiredService<Mock<IDataRepository<Neo4JRepository>>>();
         }
